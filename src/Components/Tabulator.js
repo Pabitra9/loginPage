@@ -10,7 +10,7 @@ const Tabulator = () => {
     setData(jsonData);
   }, []);
   return (
-    <div className="cointainer mx-auto p-4">
+    <div className="cointainer min-h-screen mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Data Table</h1>
       <table className="min-w-full bg-white rounded-lg shadow-lg">
         <thead>

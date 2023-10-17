@@ -11,7 +11,7 @@ function Layout({ children }) {
 console.log(isSidebarOpen);
   return (
     <>
-    <div className={` bg-[#2960a1] flex`} >
+    <div className={`min-h-screen bg-[#2960a1] flex`} >
     {/* <div className={`sm ${isSidebarOpen ? 'ml-0' : 'hidden'} md: flex `}> */}
     <div className={`desktop:flex mobile: ${isSidebarOpen ? 'ml-0' : 'hidden'}`}>
       <Sidebar isSidebarOpen={isSidebarOpen} setSidebarOpen={setSidebarOpen} />
