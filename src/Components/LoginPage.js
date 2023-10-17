@@ -16,7 +16,7 @@ function LoginPage() {
     setLoggedIn(true);
   };
   return (
-    <div className="min-h-screen p-8 rounded-lg shadow-lg flex flex-col md:flex-row items-center justify-center w-full bg-[#E7EBF2]">
+    <div className="min-h-screen p-8 rounded-lg gap-36 shadow-lg flex md:flex-row items-center justify-center w-full bg-[#E7EBF2]">
     <img src={vector} className='absolute top-[100px] left-0 w-56'/>
     <img src={ellipse} className='absolute top-[180px] left-80 w-8'/>
     <img src={diamond} className='absolute top-[520px] left-24 w-48'/>
@@ -30,7 +30,7 @@ function LoginPage() {
       </div>
 
       {/* Right Partition for Login Form */}
-      <div className="md:w-1/4 rounded-lg shadow-lg p-8 bg-white">
+      <div className="md:w-1/4 rounded-lg shadow-lg p-8 bg-white ml-14">
         <h2 className="text-2xl font-semibold mb-4">Login</h2>
         <form onSubmit={(e)=>handleLogin(e)}>
           <div className="mb-4">
