@@ -30,7 +30,7 @@ function LoginPage() {
       </div>
 
       {/* Right Partition for Login Form */}
-      <div className="md:w-1/4 rounded-lg shadow-lg p-8 bg-white ml-14">
+      <div className="md:w-1/4 rounded-lg shadow-lg p-8 bg-chrmpWhite ml-14">
         <h2 className="text-2xl font-semibold mb-4">Login</h2>
         <form onSubmit={(e)=>handleLogin(e)}>
           <div className="mb-4">
