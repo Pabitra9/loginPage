@@ -58,7 +58,7 @@ function LoginPage() {
             />
           </div>
           <button
-            className="bg-[#2960a1] text-white py-2 px-4 w-full font-semibold rounded-lg hover:bg-[#8dc162] focus:outline-none focus:bg-[#8dc162]"
+            className="bg-[#2960a1] text-chrmpWhite py-2 px-4 w-full font-semibold rounded-lg hover:bg-[#8dc162] focus:outline-none focus:bg-[#8dc162]"
             type="submit"
           >
             Login

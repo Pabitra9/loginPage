@@ -7,7 +7,8 @@ module.exports = {
     colors: {
       'chrmpBlue':'#2960A1',
       'chrmpGreen':'#8DC162',
-      'chrmpWhite':'#FFFFFF'
+      'chrmpWhite':'#FFFFFF',
+      'chrmpGray' : '#E5E7EB'
     },
     screens: {
       'mobile': '390px' && {max : '767px'},
