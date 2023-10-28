@@ -6,10 +6,12 @@ import Layout from "./Components/Shared/Layout";
 import Menu1 from "./Components/Menu1";
 import Menu2 from "./Components/Menu2";
 import LogOutPage from "./LogOutPage";
+import Registration from "./Registration/Registration";
 const Router= () => {
     const routes = useRoutes([
         { path: '/login', element: <LoginPage /> },
         { path: '/logout', element: <LogOutPage /> },
+        { path: '/form', element: <Registration /> },
         {
           path: '/',
           element: (

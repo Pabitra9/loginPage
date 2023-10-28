@@ -41,4 +41,4 @@ const Header = ({isSidebarOpen, setSidebarOpen}) => {
   )
 }
 
-export default Header
+export default Header;
