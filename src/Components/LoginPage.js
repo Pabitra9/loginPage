@@ -30,7 +30,7 @@ function LoginPage() {
       </div>
 
       {/* Right Partition for Login Form */}
-      <div className="md:w-1/4 rounded-lg shadow-lg p-8 bg-chrmpWhite ml-14">
+      <div className="md:w-1/4 rounded-lg shadow-lg p-8 bg-white ml-14">
         <h2 className="text-2xl font-semibold mb-4">Login</h2>
         <form onSubmit={(e)=>handleLogin(e)}>
           <div className="mb-4">
@@ -58,7 +58,7 @@ function LoginPage() {
             />
           </div>
           <button
-            className="bg-[#2960a1] text-chrmpWhite py-2 px-4 w-full font-semibold rounded-lg hover:bg-[#8dc162] focus:outline-none focus:bg-[#8dc162]"
+            className="bg-[#2960a1] text-white py-2 px-4 w-full font-semibold rounded-lg hover:bg-[#8dc162] focus:outline-none focus:bg-[#8dc162]"
             type="submit"
           >
             Login

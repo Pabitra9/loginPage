@@ -261,9 +261,9 @@ function Registration() {
   return (
     <div className="font-roboto bg-gray-100 p-4">
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-md shadow-md shadow-gray">
-            <div className="bg-chrmpBlue rounded-md">
+            <div className="bg-[#2960a1] rounded-md">
               
-            <h2 className="text-2xl font-semibold mb-4 font-open-sans text-left p-2 text-chrmpWhite">CHRMP Academy Registration Form</h2>
+            <h2 className="text-2xl font-semibold mb-4 font-open-sans text-left p-2 text-white">CHRMP Academy Registration Form</h2>
             </div>
 
             <form action="#" method="POST">
@@ -470,7 +470,7 @@ function Registration() {
     
                 {/* <!-- Submit Button --> */}
                 <div className="mt-6">
-                    <button type="submit" className="bg-chrmpBlue hover:bg-chrmpGreen text-chrmpWhite py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out">Submit</button>
+                    <button type="submit" className="bg-[#2960a1] hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out">Submit</button>
                 </div>
                 
             </form>
