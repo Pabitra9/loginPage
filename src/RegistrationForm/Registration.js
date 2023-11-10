@@ -1,6 +1,11 @@
 import React from "react";
 import Country from './Countries'
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { db } from "./firebase";
+import {collection,getDocs,addDoc} from 'firebase/firestore'
+import { storage } from "./firebase";
+import { ref , uploadBytes, getDownloadURL, } from "firebase/storage";
+import { useNavigate } from "react-router-dom";
 const countries = [ 
   {name: 'Afghanistan', code: 'AF'}, 
   {name: 'Åland Islands', code: 'AX'}, 
@@ -253,10 +258,185 @@ const countries = [
 function Registration() {
 
   const [selectedCountry, setSelectedCountry] = useState('');
+  const [isDataStored, setIsDataStored] = useState(false);
+//   const fileInputRef = useRef(null);
+//   const [downloadedProfilePictureUrl, setDownloadProfilePictureUrl] = useState()
+// const [isFilled, setLIsFilled] = useState(false);
 
   const handleCountryChange = (event) => {
     setSelectedCountry(event.target.value);
   };
+
+  
+  const navigate = useNavigate()
+
+  const [formData,setFormData] = useState ({
+    name : "",
+    dob : "",
+    email : "",
+    phone : "",
+    alternativePhone : "",
+    gender : "",
+    streetAddress : "",
+    addressLine2 : "",
+    city : "",
+    state : "",
+    zipcode : "",
+    country : "",
+    certificationProgram : "",
+    registrationDate : "",
+    education : "",
+    totalExperience : "",
+    hrExperience : "",
+    prevOrg : "",
+    currentOrg : "",
+    designation : "",
+    linkedin : "",
+    howFound : "",
+    // image : "",
+    // idProof : "",
+    certificationNumber : ""
+  })
+  const [imageUpload,setImgaeUpload] = useState(null)
+  const [idproof,setIdproof] = useState(null)
+
+  const usersData = collection(db,"Database")
+
+
+  let name , value
+  const handleChange  = (e) => {
+    name = e.target.name
+    value = e.target.value
+    setFormData ({...formData,[name]:value})
+  }
+
+  
+  
+//   const uploadImage = async (file) => {
+//     // const storage = getStorage(firebase);
+//     const storageRef = ref(storage, `image/${imageUpload.name}`);
+  
+//     await uploadBytes(storageRef, file);
+  
+//     const downloadUrl = await getDownloadURL(storageRef);
+//     return downloadUrl;
+//   };
+
+  useEffect(() => {
+    console.log(imageUpload);
+    console.log(idproof);
+  }, [imageUpload,idproof])
+  
+  
+  const handleSubmit = async(e) => {
+      e.preventDefault ();
+      setIsDataStored(true)
+      // uploadImage()
+      
+      
+
+                  const imgRef = ref(storage,`image/${imageUpload?.name}`)
+                  await uploadBytes(imgRef,imageUpload)
+                  const idRef = ref(storage,`idCopy/${idproof?.name}`)
+                  await uploadBytes(idRef,idproof)
+                  const downloadProfileUrl = await getDownloadURL(imgRef);
+                  const downloadIdDocumentUrl = await getDownloadURL(idRef);
+              
+  
+        
+
+        // setDownloadProfilePictureUrl(downloadUrl)
+        console.log(e);
+
+        const {name,dob,email,phone,alternativePhone,gender, streetAddress,  addressLine2,  city, state,  zipcode, certificationProgram,  registrationDate, education, totalExperience, hrExperience, prevOrg,
+        currentOrg,designation,  linkedin, howFound,certificationNumber } = formData
+
+        console.log(downloadProfileUrl);
+        console.log(downloadIdDocumentUrl);
+        
+        if( formData.name && formData.dob && formData.email && formData.phone ){
+
+            
+
+            console.log("hauchi");
+
+            if (downloadProfileUrl && downloadIdDocumentUrl) {
+                try{ 
+                    const res = await addDoc(usersData, {name:name,dob:dob,email:email,phone:phone,alternativePhone:alternativePhone,gender:gender, streetAddress:streetAddress, addressLine2:addressLine2,city:city,state:state,zipcode:zipcode,country:selectedCountry, certificationProgram:certificationProgram,  registrationDate:registrationDate, education:education, totalExperience:totalExperience, hrExperience:hrExperience, prevOrg:prevOrg,currentOrg,designation:designation,linkedin:linkedin, howFound:howFound,certificationNumber:certificationNumber, image:downloadProfileUrl , idProof:downloadIdDocumentUrl})
+                    
+                    if(res){
+
+                        navigate('/thankyouPage')
+                    }
+            
+                console.log(res)
+            }
+    
+             catch (error) {
+                setIsDataStored(false)
+                console.error('Error adding document:', error);
+             
+              
+                
+            } 
+            }
+        }else{
+            setIsDataStored(false)
+            console.log("please fill up all the feilds")
+        }
+
+        // setFormData({name : "",
+        // dob : "",
+        // email : "",
+        // phone : "",
+        // alternativePhone : "",
+        // gender : "",
+        // streetAddress : "",
+        // addressLine2 : "",
+        // city : "",
+        // state : "",
+        // zipcode : "",
+        // country : "",
+        // certificationProgram : "",
+        // registrationDate : "",
+        // education : "",
+        // totalExperience : "",
+        // hrExperience : "",
+        // prevOrg : "",
+        // currentOrg : "",
+        // designation : "",
+        // linkedin : "",
+        // howFound : "",
+        // // image : "",
+        // // idProof : "",
+        // certificationNumber : ""})
+       
+  
+       
+        
+
+        {console.log("Done")};
+        // setImgaeUpload(null)
+    // }
+        
+   
+        
+        // console.log(downloadUrl);
+        // const uploadImg = () =>{
+
+
+
+            // const storageRef = ref(storage, `image/${imageUpload.name}`);
+  
+            //  uploadBytes(storageRef, imageUpload);
+          
+            // const downloadUrl =  getDownloadURL(storageRef);
+            
+           
+            
+          }
+
+
 
   return (
     <div className="font-roboto bg-gray-100 p-4">
@@ -266,6 +446,7 @@ function Registration() {
             <h2 className="text-2xl font-semibold mb-4 font-open-sans text-left p-2 text-white">CHRMP Academy Registration Form</h2>
             </div>
 
+            {isDataStored?"loading":(
             <form action="#" method="POST">
                 {/* <!-- Personal Information Section --> */}
                 <section className="mb-6">
@@ -273,39 +454,39 @@ function Registration() {
                     {/* <!-- Name Field --> */}
                     <div className="mb-4">
                         <label for="name" className="block text-[#5D6572] font-semibold mb-2 text-sm">Full Name <span className="text-[#ff0000]">*</span></label>
-                        <input type="text" id="name" name="name" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] focus:shadow-outline transition-all duration-75 ease-linear" placeholder="Enter Your Full Name" required/>
+                        <input type="text" id="name" name="name" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] focus:shadow-outline transition-all duration-75 ease-linear" placeholder="Enter Your Full Name" value={formData.name} onChange={handleChange} required/>
                     </div>
 
                     
                     {/* <!-- Date of Birth Field --> */}
                     <div className="mb-4">
-                        <label for="dob" className="block text-[#5D6572] font-semibold mb-2 text-sm">Date of Birth *</label>
-                        <input type="date" id="dob" name="dob" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required/>
+                        <label for="dob" className="block text-[#5D6572] font-semibold mb-2 text-sm">Date of Birth <span className="text-[#ff0000]">*</span></label>
+                        <input type="date" id="dob" name="dob" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" value={formData.dob} onChange={handleChange} required/>
                     </div>
     
                     {/* <!-- Email Field --> */}
                     <div className="mb-4">
                         <label for="email" className="block text-[#5D6572] font-semibold mb-2 text-sm">Email <span className="text-[#ff0000]">*</span></label>
-                        <input type="email" id="email" name="email" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Enter Your Email" required/>
+                        <input type="email" id="email" name="email" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Enter Your Email" value={formData.email} onChange={handleChange} required/>
                     </div>
     
                     {/* <!-- Phone Field --> */}
                     <div className="mb-4">
                         <label for="phone" className="block text-[#5D6572] font-semibold mb-2 text-sm">Phone <span className="text-[#ff0000]">*</span></label>
-                        <input type="tel" id="phone" name="phone" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123-456-7890" required/>
+                        <input type="tel" id="phone" name="phone" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123-456-7890" value={formData.phone} onChange={handleChange} required/>
                     </div>
 
                     {/* <!-- Phone Field --> */}
                     <div className="mb-4">
                         <label for="phone" className="block text-[#5D6572] font-semibold mb-2 text-sm">Alternative Phone</label>
-                        <input type="tel" id="phone" name="phone" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123-456-7890" required/>
+                        <input type="tel" id="phone" name="alternativePhone" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123-456-7890" value={formData.alternativePhone} onChange={handleChange} required/>
                     </div>
     
                     {/* <!-- Gender Field --> */}
                     <div className="mb-4">
                         <label for="gender" className="block text-[#5D6572] font-semibold mb-2 text-sm">Gender <span className="text-[#ff0000]">*</span></label>
-                        <select id="gender" name="gender" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required>
-                            <option value="select" selected disabled>-Select-</option>
+                        <select id="gender" name="gender" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" value={formData.gender} onChange={handleChange} required>
+                            <option value="select" selected disabled >-Select-</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                             <option value="other">Other</option>
@@ -320,35 +501,35 @@ function Registration() {
                     {/* <!-- Street Address Field --> */}
                     <div className="mb-4">
                         <label for="streetAddress" className="block text-[#5D6572] font-semibold mb-2 text-sm">Street Address</label>
-                        <input type="text" id="streetAddress" name="streetAddress" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123 Main St"/>
+                        <input type="text" id="streetAddress" name="streetAddress" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123 Main St" value={formData.streetAddress} onChange={handleChange}/>
                     </div>
     
                     {/* <!-- Address Line 2 Field --> */}
                     <div className="mb-4">
                         <label for="addressLine2" className="block text-[#5D6572] font-semibold mb-2 text-sm">Address Line 2</label>
-                        <input type="text" id="addressLine2" name="addressLine2" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Apt 4B"/>
+                        <input type="text" id="addressLine2" name="addressLine2" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Apt 4B" value={formData.addressLine2} onChange={handleChange}/>
                     </div>
     
                     {/* <!-- City, State, Zipcode Fields --> */}
                     <div className="mb-4 md:flex">
                         <div className="md:w-1/3 mb-4 mr-2 md:mb-0">
                             <label for="city" className="block text-[#5D6572] font-semibold mb-2 text-sm">City</label>
-                            <input type="text" id="city" name="city" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="City"/>
+                            <input type="text" id="city" name="city" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="City" value={formData.city} onChange={handleChange}/>
                         </div>
                         <div className="md:w-1/3 mb-4 mr-2 md:mb-0">
                             <label for="state" className="block text-[#5D6572] font-semibold mb-2 text-sm">State</label>
-                            <input type="text" id="state" name="state" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="State"/>
+                            <input type="text" id="state" name="state" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="State" value={formData.state} onChange={handleChange}/>
                         </div>
                         <div className="md:w-1/3 mr-2">
                             <label for="zipcode" className="block text-[#5D6572] font-semibold mb-2 text-sm">Zipcode</label>
-                            <input type="text" id="zipcode" name="zipcode" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Zipcode"/>
+                            <input type="text" id="zipcode" name="zipcode" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Zipcode" value={formData.zipcode} onChange={handleChange}/>
                         </div>
                     </div>
 
                      {/* <!-- Country Field --> */}
                      <div className="mb-4">
                         <label for="addressLine2" className="block text-[#5D6572] font-semibold mb-2 text-sm">Country</label>
-                        <Country countries={countries} onChange={handleCountryChange}/>       
+                        <Country countries={countries} onChange={handleCountryChange} value={formData}/>       
                     </div>
                 </section>
     
@@ -358,7 +539,7 @@ function Registration() {
                     {/* <!-- Certification Program Field --> */}
                     <div className="mb-4">
                         <label for="certificationProgram" className="block text-[#5D6572] font-semibold mb-2 text-sm">Certification Program Enroll for <span className="text-[#ff0000]">*</span></label>
-                        <select id="certificationProgram" name="certificationProgram" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required>
+                        <select id="certificationProgram" name="certificationProgram" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={formData.certificationProgram} onChange={handleChange}>
                     <option value="" selected disabled >-Select-</option>
                     <option value="CHRMP Foundation" >CHRMP Foundation</option>
                     <option value="HRBP Advanced" >HRBP Advanced</option>
@@ -374,12 +555,12 @@ function Registration() {
                     <option value="Generative AI in HR" >Generative AI in HR</option>
                     <option value="PoSH" >PoSH</option>
                         </select>
-                    </div>
+                    </div> 
     
                     {/* <!-- Date of Registration Field --> */}
                     <div className="mb-4">
                         <label for="registrationDate" className="block text-[#5D6572] font-semibold mb-2 text-sm">Date of Registration <span className="text-[#ff0000]">*</span></label>
-                        <input type="date" id="registrationDate" name="registrationDate" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required/>
+                        <input type="date" id="registrationDate" name="registrationDate" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={formData.registrationDate} onChange={handleChange}/>
                     </div>
                 </section>
     
@@ -389,20 +570,20 @@ function Registration() {
                     {/* <!-- Education Field --> */}
                     <div className="mb-4">
                         <label for="education" className="block text-[#5D6572] font-semibold mb-2 text-sm">Education <span className="text-[#ff0000]">*</span></label>
-                        <input type="text" id="education" name="education" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Education" required/>
+                        <input type="text" id="education" name="education" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Education" required value={formData.education} onChange={handleChange}/>
                     </div>
     
                     {/* <!-- Total Year of Experience Field --> */}
                     <div className="mb-4">
                         <label for="totalExperience" className="block text-[#5D6572] font-semibold mb-2 text-sm">Total Year of Experience <span className="text-[#ff0000]">*</span></label>
-                        <input type="number" id="totalExperience" name="totalExperience" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Total Experience" required/>
+                        <input type="number" id="totalExperience" name="totalExperience" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Total Experience" required value={formData.totalExperience} onChange={handleChange}/>
                     </div>
     
                     {/* <!-- Relevant Experience in HR Field --> */}
                     <div className="mb-4">
                         <label for="hrExperience" className="block text-[#5D6572] font-semibold mb-2 text-sm">Relevant Experience in HR <span className="text-[#ff0000]">*</span></label>
-                        <select id="hrExperience" name="hrExperience" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required>
-                            <option value="select" selected disabled>-Select-</option>
+                        <select id="hrExperience" name="hrExperience" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={formData.hrExperience} onChange={handleChange}>
+                            <option value="select" selected disabled >-Select-</option>
                             <option value="0-3">0-3</option>
                             <option value="3-5">3-5</option>
                             <option value="5-7">5-7</option>
@@ -411,34 +592,34 @@ function Registration() {
                     </div>
     
                     {/* <!-- Previous Organization Name Field --> */}
-                    <div className="mb-4">
+                     <div className="mb-4">
                         <label for="prevOrg" className="block text-[#5D6572] font-semibold mb-2 text-sm">Previous Organization Name <span className="text-[#ff0000]">*</span></label>
-                        <input type="text" id="prevOrg" name="prevOrg" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Previous Organization" required/>
+                        <input type="text" id="prevOrg" name="prevOrg" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Previous Organization" required value={formData.prevOrg} onChange={handleChange}/>
                     </div>
     
                     {/* <!-- Current Organization Field --> */}
                     <div className="mb-4">
                         <label for="currentOrg" className="block text-[#5D6572] font-semibold mb-2 text-sm">Current Organization <span className="text-[#ff0000]">*</span></label>
-                        <input type="text" id="currentOrg" name="currentOrg" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Current Organization" required/>
+                        <input type="text" id="currentOrg" name="currentOrg" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Current Organization" required value={formData.currentOrg} onChange={handleChange}/>
                     </div>
     
                     {/* <!-- Designation Field --> */}
                     <div className="mb-4">
                         <label for="designation" className="block text-[#5D6572] font-semibold mb-2 text-sm">Designation <span className="text-[#ff0000]">*</span></label>
-                        <input type="text" id="designation" name="designation" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Designation" required/>
+                        <input type="text" id="designation" name="designation" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Designation" required value={formData.designation} onChange={handleChange}/>
                     </div>
     
                     {/* <!-- LinkedIn Profile URL Field --> */}
                     <div className="mb-4">
                         <label for="linkedin" className="block text-[#5D6572] font-semibold mb-2 text-sm">Your LinkedIn Profile URL <span className="text-[#ff0000]">*</span></label>
-                        <input type="url" id="linkedin" name="linkedin" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="https://linkedin.com/in/yourprofile" required/>
+                        <input type="url" id="linkedin" name="linkedin" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="https://linkedin.com/in/yourprofile" required value={formData.linkedin} onChange={handleChange}/>
                     </div>
     
                     {/* <!-- How Did You Find Us Field --> */}
                     <div className="mb-4">
                         <label for="howFound" className="block text-[#5D6572] font-semibold mb-2 text-sm">How Did You Find Us? <span className="text-[#ff0000]">*</span></label>
-                        <select id="howFound" name="howFound" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required>
-                            <option value="select" selected disabled>-Select-</option>
+                        <select id="howFound" name="howFound" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={formData.howFound} onChange={handleChange}>
+                            <option value="select" selected disabled >-Select-</option>
                             <option value="Facebook">Facebook</option>
                             <option value="Google">Google</option>
                             <option value="LinkedIn">LinkedIn</option>
@@ -451,29 +632,39 @@ function Registration() {
                     {/* <!-- Image Upload Field --> */}
                     <div className="mb-4">
                         <label for="image" className="block text-[#5D6572] font-semibold mb-2 text-sm">Image Upload <span className="text-[#ff0000]">*</span></label>
-                        <input type="file" id="image" name="image" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required/>
+                        <input type="file" id="image" name="image" accept="image/*" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required 
+                        
+                        // value={imageUpload?toString(imageUpload.name):""}
+                        
+                        onChange={(e)=>{
+                            e.preventDefault();
+                            setImgaeUpload(e.target.files[0])}}
+
+                            />
+                        
                     </div>
     
                     {/* <!-- Your Id Proof Field --> */}
                     <div className="mb-4">
                         <label for="idProof" className="block text-[#5D6572] font-semibold mb-2 text-sm">Your Id Proof <span className="text-[#ff0000]">*</span></label>
-                        <input type="file" id="idProof" name="idProof" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required/>
+                        <input type="file" id="idProof" name="idProof" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required onChange={(e)=>{ e.preventDefault()
+                            setIdproof(e.target.files[0])}} />
                     </div>
     
                     {/* <!-- Certification Number Field --> */}
                     <div className="mb-4">
                         <label for="certificationNumber" className="block text-[#5D6572] font-semibold mb-2 text-sm">Certification Number</label>
-                        <input type="text" id="certificationNumber" name="certificationNumber" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Certification Number"/>
+                        <input type="text" id="certificationNumber" name="certificationNumber" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Certification Number" value={formData.certificationNumber} onChange={handleChange}/>
                         <p className="block text-[#5D6572] font-semibold mb-2 text-sm">Not Required While Registration</p>
                     </div>
                 </section>
     
                 {/* <!-- Submit Button --> */}
                 <div className="mt-6">
-                    <button type="submit" className="bg-[#2960a1] hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out">Submit</button>
+                    <button type="submit" className="bg-[#2960a1] hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out" onClick={handleSubmit}>Submit</button>
                 </div>
                 
-            </form>
+            </form>)}
         </div>
     
 
