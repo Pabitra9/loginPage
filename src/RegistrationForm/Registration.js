@@ -330,7 +330,7 @@ function Registration() {
   
   const handleSubmit = async(e) => {
       e.preventDefault ();
-      setIsDataStored(true)
+    //   setIsDataStored(true)
       // uploadImage()
       
       
@@ -354,13 +354,14 @@ function Registration() {
         console.log(downloadProfileUrl);
         console.log(downloadIdDocumentUrl);
         
-        if( formData.name && formData.dob && formData.email && formData.phone ){
+        if( formData.name && formData.dob && formData.email && formData.phone && formData.gender && formData.certificationProgram && formData.registrationDate && formData.education && formData.totalExperience && formData.hrExperience && formData.prevOrg && formData.currentOrg && formData.designation && formData.linkedin && formData.howFound ){
 
             
-
+            setIsDataStored(true)
             console.log("hauchi");
 
             if (downloadProfileUrl && downloadIdDocumentUrl) {
+                
                 try{ 
                     const res = await addDoc(usersData, {name:name,dob:dob,email:email,phone:phone,alternativePhone:alternativePhone,gender:gender, streetAddress:streetAddress, addressLine2:addressLine2,city:city,state:state,zipcode:zipcode,country:selectedCountry, certificationProgram:certificationProgram,  registrationDate:registrationDate, education:education, totalExperience:totalExperience, hrExperience:hrExperience, prevOrg:prevOrg,currentOrg,designation:designation,linkedin:linkedin, howFound:howFound,certificationNumber:certificationNumber, image:downloadProfileUrl , idProof:downloadIdDocumentUrl})
                     
@@ -382,7 +383,7 @@ function Registration() {
             }
         }else{
             setIsDataStored(false)
-            console.log("please fill up all the feilds")
+            alert("please fill up all the feilds")
         }
 
         // setFormData({name : "",
@@ -415,7 +416,7 @@ function Registration() {
        
         
 
-        {console.log("Done")};
+        // {console.log("Done")};
         // setImgaeUpload(null)
     // }
         
@@ -445,8 +446,8 @@ function Registration() {
               
             <h2 className="text-2xl font-semibold mb-4 font-open-sans text-left p-2 text-white">CHRMP Academy Registration Form</h2>
             </div>
-
-            {isDataStored?"loading":(
+       
+            {isDataStored?<div><h1 className="text-3xl ">Please wait the data's are uploading ...</h1></div>:(
             <form action="#" method="POST">
                 {/* <!-- Personal Information Section --> */}
                 <section className="mb-6">
