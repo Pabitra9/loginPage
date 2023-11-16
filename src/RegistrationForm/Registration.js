@@ -6,6 +6,9 @@ import {collection,getDocs,addDoc} from 'firebase/firestore'
 import { storage } from "./firebase";
 import { ref , uploadBytes, getDownloadURL, } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
+import { singUpSchema } from "../Components/YupSchema";
+
 const countries = [ 
   {name: 'Afghanistan', code: 'AF'}, 
   {name: 'Åland Islands', code: 'AX'}, 
@@ -256,7 +259,7 @@ const countries = [
 ]
 
 function Registration() {
-
+    
   const [selectedCountry, setSelectedCountry] = useState('');
   const [isDataStored, setIsDataStored] = useState(false);
 //   const fileInputRef = useRef(null);
@@ -270,45 +273,88 @@ function Registration() {
   
   const navigate = useNavigate()
 
-  const [formData,setFormData] = useState ({
-    name : "",
-    dob : "",
-    email : "",
-    phone : "",
-    alternativePhone : "",
-    gender : "",
-    streetAddress : "",
-    addressLine2 : "",
-    city : "",
-    state : "",
-    zipcode : "",
-    country : "",
-    certificationProgram : "",
-    registrationDate : "",
-    education : "",
-    totalExperience : "",
-    hrExperience : "",
-    prevOrg : "",
-    currentOrg : "",
-    designation : "",
-    linkedin : "",
-    howFound : "",
-    // image : "",
-    // idProof : "",
-    certificationNumber : ""
-  })
+//   const [formData,setFormData] = useState ({
+//     name : "",
+//     dob : "",
+//     email : "",
+//     phone : "",
+//     alternativePhone : "",
+//     gender : "",
+//     streetAddress : "",
+//     addressLine2 : "",
+//     city : "",
+//     state : "",
+//     zipcode : "",
+//     country : "",
+//     certificationProgram : "",
+//     registrationDate : "",
+//     education : "",
+//     totalExperience : "",
+//     hrExperience : "",
+//     prevOrg : "",
+//     currentOrg : "",
+//     designation : "",
+//     linkedin : "",
+//     howFound : "",
+//     // image : "",
+//     // idProof : "",
+//     certificationNumber : ""
+//   })
+
+  const initialValues = {
+        name : "",
+        dob : "",
+        email : "",
+        phone : "",
+        alternativePhone : "",
+        gender : "",
+        streetAddress : "",
+        addressLine2 : "",
+        city : "",
+        state : "",
+        zipcode : "",
+        country : "",
+        certificationProgram : "",
+        registrationDate : "",
+        education : "",
+        totalExperience : "",
+        hrExperience : "",
+        prevOrg : "",
+        currentOrg : "",
+        designation : "",
+        linkedin : "",
+        howFound : "",
+        image : "",
+        idProof : "",
+        certificationNumber : ""
+  }
+//   console.log(initialValues);
+
+  const {values, errors, handleChange , handleBlur , handleSubmit, touched} = useFormik({
+    initialValues : initialValues,
+    validationSchema : singUpSchema,
+    onSubmit : (values) => {
+        console.log(values);
+    }
+
+})
+console.log(errors);
+
+
+ 
+
   const [imageUpload,setImgaeUpload] = useState(null)
   const [idproof,setIdproof] = useState(null)
 
   const usersData = collection(db,"Database")
 
 
-  let name , value
-  const handleChange  = (e) => {
-    name = e.target.name
-    value = e.target.value
-    setFormData ({...formData,[name]:value})
-  }
+//   let name , value
+//   const handleChange  = (e) => {
+//     name = e.target.name
+//     value = e.target.value
+//     setFormData ({...formData,[name]:value})
+//   }
 
   
   
@@ -328,8 +374,9 @@ function Registration() {
   }, [imageUpload,idproof])
   
   
-  const handleSubmit = async(e) => {
+  const handleSubmitData = async(e) => {
       e.preventDefault ();
+      handleSubmit();
     //   setIsDataStored(true)
       // uploadImage()
       
@@ -349,12 +396,12 @@ function Registration() {
         console.log(e);
 
         const {name,dob,email,phone,alternativePhone,gender, streetAddress,  addressLine2,  city, state,  zipcode, certificationProgram,  registrationDate, education, totalExperience, hrExperience, prevOrg,
-        currentOrg,designation,  linkedin, howFound,certificationNumber } = formData
+        currentOrg,designation,  linkedin, howFound,certificationNumber } = values
 
         console.log(downloadProfileUrl);
         console.log(downloadIdDocumentUrl);
         
-        if( formData.name && formData.dob && formData.email && formData.phone && formData.gender && formData.certificationProgram && formData.registrationDate && formData.education && formData.totalExperience && formData.hrExperience && formData.prevOrg && formData.currentOrg && formData.designation && formData.linkedin && formData.howFound ){
+        if( true){
 
             
             setIsDataStored(true)
@@ -455,44 +502,49 @@ function Registration() {
                     {/* <!-- Name Field --> */}
                     <div className="mb-4">
                         <label for="name" className="block text-[#5D6572] font-semibold mb-2 text-sm">Full Name <span className="text-[#ff0000]">*</span></label>
-                        <input type="text" id="name" name="name" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] focus:shadow-outline transition-all duration-75 ease-linear" placeholder="Enter Your Full Name" value={formData.name} onChange={handleChange} required/>
+                        <input type="text" id="name" name="name" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] focus:shadow-outline transition-all duration-75 ease-linear" placeholder="Enter Your Full Name" value={values.name} onChange={handleChange} onBlur={handleBlur} required/>
+                        {errors.name && touched.name ? <p className="text-[#ff0000]">{errors.name}</p>:null}
                     </div>
 
                     
                     {/* <!-- Date of Birth Field --> */}
                     <div className="mb-4">
                         <label for="dob" className="block text-[#5D6572] font-semibold mb-2 text-sm">Date of Birth <span className="text-[#ff0000]">*</span></label>
-                        <input type="date" id="dob" name="dob" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" value={formData.dob} onChange={handleChange} required/>
+                        <input type="date" id="dob" name="dob" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" value={values.dob} onBlur={handleBlur} onChange={handleChange} required/>
+                        {errors.dob && touched.dob ? <p className="text-[#ff0000]">{errors.dob}</p>:null}
                     </div>
     
                     {/* <!-- Email Field --> */}
                     <div className="mb-4">
                         <label for="email" className="block text-[#5D6572] font-semibold mb-2 text-sm">Email <span className="text-[#ff0000]">*</span></label>
-                        <input type="email" id="email" name="email" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Enter Your Email" value={formData.email} onChange={handleChange} required/>
+                        <input type="email" id="email" name="email" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Enter Your Email" value={values.email} onBlur={handleBlur} onChange={handleChange} required/>
+                        {errors.email && touched.email ? <p className="text-[#ff0000]">{errors.email}</p>:null}
                     </div>
     
                     {/* <!-- Phone Field --> */}
                     <div className="mb-4">
                         <label for="phone" className="block text-[#5D6572] font-semibold mb-2 text-sm">Phone <span className="text-[#ff0000]">*</span></label>
-                        <input type="tel" id="phone" name="phone" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123-456-7890" value={formData.phone} onChange={handleChange} required/>
+                        <input type="tel" id="phone" name="phone" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123-456-7890" value={values.phone} onBlur={handleBlur} onChange={handleChange} required/>
+                        {errors.phone && touched.phone ? <p className="text-[#ff0000]">{errors.phone}</p>:null}
                     </div>
 
                     {/* <!-- Phone Field --> */}
                     <div className="mb-4">
                         <label for="phone" className="block text-[#5D6572] font-semibold mb-2 text-sm">Alternative Phone</label>
-                        <input type="tel" id="phone" name="alternativePhone" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123-456-7890" value={formData.alternativePhone} onChange={handleChange} required/>
+                        <input type="tel" id="phone" name="alternativePhone" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123-456-7890" value={values.alternativePhone} onBlur={handleBlur} onChange={handleChange} required/>
                     </div>
     
                     {/* <!-- Gender Field --> */}
                     <div className="mb-4">
                         <label for="gender" className="block text-[#5D6572] font-semibold mb-2 text-sm">Gender <span className="text-[#ff0000]">*</span></label>
-                        <select id="gender" name="gender" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" value={formData.gender} onChange={handleChange} required>
-                            <option value="select" selected disabled >-Select-</option>
+                        <select id="gender" name="gender" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" value={values.gender} onBlur={handleBlur} onChange={handleChange} required>
+                            <option value="select" selected >-Select-</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                             <option value="other">Other</option>
                             <option value="dont-say">Don't Want to Say</option>
                         </select>
+                        {errors.gender && touched.gender ? <p className="text-[#ff0000]">{errors.gender}</p>:null}
                     </div>
                 </section>
 
@@ -502,35 +554,35 @@ function Registration() {
                     {/* <!-- Street Address Field --> */}
                     <div className="mb-4">
                         <label for="streetAddress" className="block text-[#5D6572] font-semibold mb-2 text-sm">Street Address</label>
-                        <input type="text" id="streetAddress" name="streetAddress" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123 Main St" value={formData.streetAddress} onChange={handleChange}/>
+                        <input type="text" id="streetAddress" name="streetAddress" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="123 Main St" value={values.streetAddress} onBlur={handleBlur} onChange={handleChange}/>
                     </div>
     
                     {/* <!-- Address Line 2 Field --> */}
                     <div className="mb-4">
                         <label for="addressLine2" className="block text-[#5D6572] font-semibold mb-2 text-sm">Address Line 2</label>
-                        <input type="text" id="addressLine2" name="addressLine2" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Apt 4B" value={formData.addressLine2} onChange={handleChange}/>
+                        <input type="text" id="addressLine2" name="addressLine2" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Apt 4B" value={values.addressLine2} onBlur={handleBlur} onChange={handleChange}/>
                     </div>
     
                     {/* <!-- City, State, Zipcode Fields --> */}
                     <div className="mb-4 md:flex">
                         <div className="md:w-1/3 mb-4 mr-2 md:mb-0">
                             <label for="city" className="block text-[#5D6572] font-semibold mb-2 text-sm">City</label>
-                            <input type="text" id="city" name="city" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="City" value={formData.city} onChange={handleChange}/>
+                            <input type="text" id="city" name="city" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="City" value={values.city} onBlur={handleBlur} onChange={handleChange}/>
                         </div>
                         <div className="md:w-1/3 mb-4 mr-2 md:mb-0">
                             <label for="state" className="block text-[#5D6572] font-semibold mb-2 text-sm">State</label>
-                            <input type="text" id="state" name="state" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="State" value={formData.state} onChange={handleChange}/>
+                            <input type="text" id="state" name="state" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="State" value={values.state} onBlur={handleBlur} onChange={handleChange}/>
                         </div>
                         <div className="md:w-1/3 mr-2">
                             <label for="zipcode" className="block text-[#5D6572] font-semibold mb-2 text-sm">Zipcode</label>
-                            <input type="text" id="zipcode" name="zipcode" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Zipcode" value={formData.zipcode} onChange={handleChange}/>
+                            <input type="text" id="zipcode" name="zipcode" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="zipcode" value={values.zipcode} onBlur={handleBlur} onChange={handleChange}/>
                         </div>
                     </div>
 
                      {/* <!-- Country Field --> */}
                      <div className="mb-4">
                         <label for="addressLine2" className="block text-[#5D6572] font-semibold mb-2 text-sm">Country</label>
-                        <Country countries={countries} onChange={handleCountryChange} value={formData}/>       
+                        <Country countries={countries} onChange={handleCountryChange} onBlur={handleBlur} value={initialValues}/>       
                     </div>
                 </section>
     
@@ -540,8 +592,8 @@ function Registration() {
                     {/* <!-- Certification Program Field --> */}
                     <div className="mb-4">
                         <label for="certificationProgram" className="block text-[#5D6572] font-semibold mb-2 text-sm">Certification Program Enroll for <span className="text-[#ff0000]">*</span></label>
-                        <select id="certificationProgram" name="certificationProgram" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={formData.certificationProgram} onChange={handleChange}>
-                    <option value="" selected disabled >-Select-</option>
+                        <select id="certificationProgram" name="certificationProgram" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={values.certificationProgram} onBlur={handleBlur} onChange={handleChange}>
+                    <option value="" selected >-Select-</option>
                     <option value="CHRMP Foundation" >CHRMP Foundation</option>
                     <option value="HRBP Advanced" >HRBP Advanced</option>
                     <option value="HR Analytics" >HR Analytics</option>
@@ -556,12 +608,14 @@ function Registration() {
                     <option value="Generative AI in HR" >Generative AI in HR</option>
                     <option value="PoSH" >PoSH</option>
                         </select>
+                        {errors.certificationProgram && touched.certificationProgram ? <p className="text-[#ff0000]">{errors.certificationProgram}</p> : null}
                     </div> 
     
                     {/* <!-- Date of Registration Field --> */}
                     <div className="mb-4">
                         <label for="registrationDate" className="block text-[#5D6572] font-semibold mb-2 text-sm">Date of Registration <span className="text-[#ff0000]">*</span></label>
-                        <input type="date" id="registrationDate" name="registrationDate" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={formData.registrationDate} onChange={handleChange}/>
+                        <input type="date" id="registrationDate" name="registrationDate" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={values.registrationDate} onBlur={handleBlur} onChange={handleChange}/>
+                        {errors.registrationDate && touched.registrationDate ? <p className="text-[#ff0000]">{errors.registrationDate}</p>:null}
                     </div>
                 </section>
     
@@ -571,55 +625,62 @@ function Registration() {
                     {/* <!-- Education Field --> */}
                     <div className="mb-4">
                         <label for="education" className="block text-[#5D6572] font-semibold mb-2 text-sm">Education <span className="text-[#ff0000]">*</span></label>
-                        <input type="text" id="education" name="education" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Education" required value={formData.education} onChange={handleChange}/>
+                        <input type="text" id="education" name="education" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Education" required value={values.education} onBlur={handleBlur} onChange={handleChange}/>
+                        {errors.education && touched.education ? <p className="text-[#ff0000]">{errors.education}</p>:null}
                     </div>
     
                     {/* <!-- Total Year of Experience Field --> */}
                     <div className="mb-4">
                         <label for="totalExperience" className="block text-[#5D6572] font-semibold mb-2 text-sm">Total Year of Experience <span className="text-[#ff0000]">*</span></label>
-                        <input type="number" id="totalExperience" name="totalExperience" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Total Experience" required value={formData.totalExperience} onChange={handleChange}/>
+                        <input type="number" id="totalExperience" name="totalExperience" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Total Experience" required value={values.totalExperience} onBlur={handleBlur} onChange={handleChange}/>
+                        {errors.totalExperience && touched.totalExperience ? <p className="text-[#ff0000]">{errors.totalExperience}</p>:null}
                     </div>
     
                     {/* <!-- Relevant Experience in HR Field --> */}
                     <div className="mb-4">
                         <label for="hrExperience" className="block text-[#5D6572] font-semibold mb-2 text-sm">Relevant Experience in HR <span className="text-[#ff0000]">*</span></label>
-                        <select id="hrExperience" name="hrExperience" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={formData.hrExperience} onChange={handleChange}>
-                            <option value="select" selected disabled >-Select-</option>
+                        <select id="hrExperience" name="hrExperience" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={values.hrExperience} onBlur={handleBlur} onChange={handleChange}>
+                            <option value="select" selected>-Select-</option>
                             <option value="0-3">0-3</option>
                             <option value="3-5">3-5</option>
                             <option value="5-7">5-7</option>
                             <option value="7 & Above">7 & Above</option>
                         </select>
+                        {errors.hrExperience && touched.hrExperience ? <p className="text-[#ff0000]">{errors.hrExperience}</p>:null}
                     </div>
     
                     {/* <!-- Previous Organization Name Field --> */}
                      <div className="mb-4">
                         <label for="prevOrg" className="block text-[#5D6572] font-semibold mb-2 text-sm">Previous Organization Name <span className="text-[#ff0000]">*</span></label>
-                        <input type="text" id="prevOrg" name="prevOrg" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Previous Organization" required value={formData.prevOrg} onChange={handleChange}/>
+                        <input type="text" id="prevOrg" name="prevOrg" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Previous Organization" required value={values.prevOrg} onBlur={handleBlur} onChange={handleChange}/>
+                        {errors.prevOrg && touched.prevOrg ? <p className="text-[#ff0000]">{errors.prevOrg}</p>:null}
                     </div>
     
                     {/* <!-- Current Organization Field --> */}
                     <div className="mb-4">
                         <label for="currentOrg" className="block text-[#5D6572] font-semibold mb-2 text-sm">Current Organization <span className="text-[#ff0000]">*</span></label>
-                        <input type="text" id="currentOrg" name="currentOrg" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Current Organization" required value={formData.currentOrg} onChange={handleChange}/>
+                        <input type="text" id="currentOrg" name="currentOrg" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Current Organization" required value={values.currentOrg} onBlur={handleBlur} onChange={handleChange}/>
+                        {errors.currentOrg && touched.currentOrg ? <p className="text-[#ff0000]">{errors.currentOrg}</p>:null}
                     </div>
     
                     {/* <!-- Designation Field --> */}
                     <div className="mb-4">
                         <label for="designation" className="block text-[#5D6572] font-semibold mb-2 text-sm">Designation <span className="text-[#ff0000]">*</span></label>
-                        <input type="text" id="designation" name="designation" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Designation" required value={formData.designation} onChange={handleChange}/>
+                        <input type="text" id="designation" name="designation" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Designation" required value={values.designation} onBlur={handleBlur} onChange={handleChange}/>
+                        {errors.designation && touched.designation ? <p className="text-[#ff0000]">{errors.designation}</p>:null}
                     </div>
     
                     {/* <!-- LinkedIn Profile URL Field --> */}
                     <div className="mb-4">
                         <label for="linkedin" className="block text-[#5D6572] font-semibold mb-2 text-sm">Your LinkedIn Profile URL <span className="text-[#ff0000]">*</span></label>
-                        <input type="url" id="linkedin" name="linkedin" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="https://linkedin.com/in/yourprofile" required value={formData.linkedin} onChange={handleChange}/>
+                        <input type="url" id="linkedin" name="linkedin" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="https://linkedin.com/in/yourprofile" required value={values.linkedin} onBlur={handleBlur} onChange={handleChange}/>
+                        {errors.linkedin && touched.linkedin ? <p className="text-[#ff0000]">{errors.linkedin}</p>:null}
                     </div>
     
                     {/* <!-- How Did You Find Us Field --> */}
                     <div className="mb-4">
                         <label for="howFound" className="block text-[#5D6572] font-semibold mb-2 text-sm">How Did You Find Us? <span className="text-[#ff0000]">*</span></label>
-                        <select id="howFound" name="howFound" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={formData.howFound} onChange={handleChange}>
+                        <select id="howFound" name="howFound" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={values.howFound} onBlur={handleBlur} onChange={handleChange}>
                             <option value="select" selected disabled >-Select-</option>
                             <option value="Facebook">Facebook</option>
                             <option value="Google">Google</option>
@@ -628,6 +689,7 @@ function Registration() {
                             <option value="Email">Email</option>
                             <option value="Friend Referral">Friend Referral</option>
                         </select>
+                        {errors.howFound && touched.howFound ?<p className="text-[#ff0000]">{errors.howFound}</p>:null}
                     </div>
     
                     {/* <!-- Image Upload Field --> */}
@@ -642,6 +704,7 @@ function Registration() {
                             setImgaeUpload(e.target.files[0])}}
 
                             />
+                            {/* {<p className="text-[#ff0000]">{errors.image}</p>} */}
                         
                     </div>
     
@@ -650,19 +713,20 @@ function Registration() {
                         <label for="idProof" className="block text-[#5D6572] font-semibold mb-2 text-sm">Your Id Proof <span className="text-[#ff0000]">*</span></label>
                         <input type="file" id="idProof" name="idProof" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required onChange={(e)=>{ e.preventDefault()
                             setIdproof(e.target.files[0])}} />
+                          {/* {<p className="text-[#ff0000]">{errors.idProof}</p>}   */}
                     </div>
     
                     {/* <!-- Certification Number Field --> */}
                     <div className="mb-4">
                         <label for="certificationNumber" className="block text-[#5D6572] font-semibold mb-2 text-sm">Certification Number</label>
-                        <input type="text" id="certificationNumber" name="certificationNumber" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Certification Number" value={formData.certificationNumber} onChange={handleChange}/>
+                        <input type="text" id="certificationNumber" name="certificationNumber" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" placeholder="Your Certification Number" value={values.certificationNumber} onBlur={handleBlur} onChange={handleChange}/>
                         <p className="block text-[#5D6572] font-semibold mb-2 text-sm">Not Required While Registration</p>
                     </div>
                 </section>
     
                 {/* <!-- Submit Button --> */}
                 <div className="mt-6">
-                    <button type="submit" className="bg-[#2960a1] hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out" onClick={handleSubmit}>Submit</button>
+                    <button type="submit" className="bg-[#2960a1] hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out" onClick={handleSubmitData}>Submit</button>
                 </div>
                 
             </form>)}

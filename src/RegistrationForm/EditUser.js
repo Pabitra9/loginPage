@@ -5,9 +5,11 @@ import { storage  } from "./firebase";
 import { ref, uploadBytes ,getDownloadURL } from "firebase/storage";
 import { useParams } from "react-router-dom";
 import loginImg from "../login.jpg"
+import { useNavigate } from "react-router-dom";
 
 function EditUser() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [currentDataFromFirebase, setCurrentDataFromFirebase] = useState({});
   // const [imageUrl, setImageUrl] = useState("");
@@ -64,6 +66,7 @@ function EditUser() {
 
       // You can add a success message or redirect the user here.
       // alert("Data updated successfully");
+      navigate('/')
     } catch (error) {
       console.error("Error updating data:", error);
     }
@@ -144,7 +147,7 @@ function EditUser() {
                 <div className="flex flex-wrap gap-4 m-8">
               <div className="w-1/3">
               <label className="mb-2 font-medium">Address</label>
-              <input type="text" name="streetAddress" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.streetAddress} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, sreetAddress: e.target.value })} />
+              <input type="text" name="streetAddress" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.streetAddress} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, streetAddress: e.target.value })} />
               <label className="mb-2 font-medium">Address 2</label>
               <input type="text" name="addressLine2" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.addressLine2} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, addressLine2: e.target.value })} />
               <label className="mb-2 font-medium">City</label>
@@ -154,7 +157,7 @@ function EditUser() {
               <label className="mb-2 font-medium">State</label>
               <input type="text" name="state" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.state} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, state: e.target.value })}/>
               <label className="mb-2 font-medium">Zipcode</label>
-              <input type="text" name="zipcode" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.zipcode} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, Zipcode: e.target.value })} />
+              <input type="text" name="zipcode" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.zipcode} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, zipcode: e.target.value })} />
               <label className="mb-2 font-medium">Country</label>
               <input type="text" name="country" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent"value={currentDataFromFirebase.country} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, country: e.target.value })} />
             </div>
