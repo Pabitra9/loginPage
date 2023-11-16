@@ -333,8 +333,9 @@ function Registration() {
   const {values, errors, handleChange , handleBlur , handleSubmit, touched} = useFormik({
     initialValues : initialValues,
     validationSchema : singUpSchema,
-    onSubmit : (values) => {
+    onSubmit : (values,action) => {
         console.log(values);
+        action.resetForm()
     }
 
 })
@@ -401,10 +402,10 @@ console.log(errors);
         console.log(downloadProfileUrl);
         console.log(downloadIdDocumentUrl);
         
-        if( true){
+        if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound ){
 
             
-            setIsDataStored(true)
+            setIsDataStored(true) 
             console.log("hauchi");
 
             if (downloadProfileUrl && downloadIdDocumentUrl) {
