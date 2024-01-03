@@ -16,11 +16,11 @@ export const singUpSchema = Yup.object({
     designation : Yup.string().nullable().required('Please enter your Designation'),
     linkedin : Yup.string().url().nullable().required('Please enter your linkedin URL'),
     howFound :  Yup.mixed().oneOf(['Facebook', 'Google', 'LinkedIn','Webinar','Email','Friend Referral']).defined().required('Please select one of these'),
-    image : Yup.object().shape({
-        file: Yup.mixed().required('File is required'),
-    }),
-    idProof : Yup.object().shape({
-        file: Yup.mixed().required('File is required'),
-    }),
+    // image : Yup.object().shape({
+    //     file: Yup.mixed().required('File is required'),
+    // }),
+    // idProof : Yup.object().shape({
+    //     file: Yup.mixed().required('File is required'),
+    // }),
 
 })

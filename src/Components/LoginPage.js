@@ -7,13 +7,43 @@ import ellipse from '../Ellipse 1184.svg'
 import diamond from '../Group 1000003346.svg'
 import circle from '../Ellipse 1185.svg'
 import diamond2 from '../Group 1000003347.svg'
+import { firebaseAuth } from '../RegistrationForm/firebase';
+import { createUserWithEmailAndPassword , signInWithEmailAndPassword } from 'firebase/auth';
+import { useDispatch } from 'react-redux';
+import { addUser } from '../Redux/UserSlice';
 function LoginPage() {
   const [isLoggedIn, setLoggedIn] = useState(false);
+  const [inputEmail,setInputEmail] = useState(); 
+    const [inputPassword,setInputPassword] = useState(); 
 
-  const handleLogin = (e) => {
+    const userDispatch = useDispatch()
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     // Perform login logic here, and if successful, set isLoggedIn to true
-    setLoggedIn(true);
+    // const credentialsSubmitted = async () => {
+      try {
+          await signInWithEmailAndPassword(firebaseAuth, inputEmail, inputPassword)
+          .then((userCredential) => {
+              // Signed in 
+              const user = userCredential.user;
+              // console.log(user);
+              const filteredUser = {
+                  email : user.email,
+                  token : user.accessToken,
+                  displayName : user.displayName,
+                  userId : user.uid,
+              }
+              if (filteredUser.token) {
+                  console.log(filteredUser);
+                  userDispatch(addUser(filteredUser))
+                  setLoggedIn(true);
+              }
+            })
+      } catch (error) {
+          console.error(error)
+      // }
+  }
   };
   return (
     <div className="min-h-screen p-8 rounded-lg gap-36 shadow-lg flex md:flex-row items-center justify-center w-full bg-[#E7EBF2]">
@@ -23,7 +53,7 @@ function LoginPage() {
     <img src={circle} className='absolute top-[90px] left-[45%] w-16'/>
     <img src={diamond2} className='absolute top-[80px] left-[55%] w-16'/>
 
-    {isLoggedIn && <Navigate to="/" replace={true} />}
+    {isLoggedIn && <Navigate to="/"/>}
       {/* Left Partition for Image */}
       <div className="md:w-2/4 mb-4 md:mb-0 pr-12">
         <img src={loginPic} className="max-h-72 max-w-full mx-auto"/>
@@ -32,9 +62,9 @@ function LoginPage() {
       {/* Right Partition for Login Form */}
       <div className="md:w-1/4 rounded-lg shadow-lg p-8 bg-white ml-14">
         <h2 className="text-2xl font-semibold mb-4">Login</h2>
-        <form onSubmit={(e)=>handleLogin(e)}>
+        <form >
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="email">
+            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="email" >
               Email
             </label>
             <input
@@ -43,6 +73,7 @@ function LoginPage() {
               id="email"
               name="email"
               placeholder="Email"
+              onChange={(e) => {setInputEmail(e.target.value)}}
             />
           </div>
           <div className="mb-4">
@@ -55,11 +86,12 @@ function LoginPage() {
               id="password"
               name="password"
               placeholder="Password"
+              onChange={(e) => {setInputPassword(e.target.value)}}
             />
           </div>
           <button
             className="bg-[#2960a1] text-white py-2 px-4 w-full font-semibold rounded-lg hover:bg-[#8dc162] focus:outline-none focus:bg-[#8dc162]"
-            type="submit"
+            type="submit" onClick={(e) => handleLogin(e)}
           >
             Login
           </button>

@@ -1,6 +1,6 @@
 import React from "react";
 import Country from './Countries'
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { db } from "./firebase";
 import {collection,getDocs,addDoc} from 'firebase/firestore'
 import { storage } from "./firebase";
@@ -324,8 +324,8 @@ function Registration() {
         designation : "",
         linkedin : "",
         howFound : "",
-        image : "",
-        idProof : "",
+        // image : "",
+        // idProof : "",
         certificationNumber : ""
   }
 //   console.log(initialValues);
@@ -402,13 +402,14 @@ console.log(errors);
         console.log(downloadProfileUrl);
         console.log(downloadIdDocumentUrl);
         
-        if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound ){
+        if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound && imageUpload && idproof ){
 
             
             setIsDataStored(true) 
             console.log("hauchi");
 
             if (downloadProfileUrl && downloadIdDocumentUrl) {
+                console.log("image b hela");
                 
                 try{ 
                     const res = await addDoc(usersData, {name:name,dob:dob,email:email,phone:phone,alternativePhone:alternativePhone,gender:gender, streetAddress:streetAddress, addressLine2:addressLine2,city:city,state:state,zipcode:zipcode,country:selectedCountry, certificationProgram:certificationProgram,  registrationDate:registrationDate, education:education, totalExperience:totalExperience, hrExperience:hrExperience, prevOrg:prevOrg,currentOrg,designation:designation,linkedin:linkedin, howFound:howFound,certificationNumber:certificationNumber, image:downloadProfileUrl , idProof:downloadIdDocumentUrl})
@@ -682,7 +683,7 @@ console.log(errors);
                     <div className="mb-4">
                         <label for="howFound" className="block text-[#5D6572] font-semibold mb-2 text-sm">How Did You Find Us? <span className="text-[#ff0000]">*</span></label>
                         <select id="howFound" name="howFound" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required value={values.howFound} onBlur={handleBlur} onChange={handleChange}>
-                            <option value="select" selected disabled >-Select-</option>
+                            <option value="select" selected >-Select-</option>
                             <option value="Facebook">Facebook</option>
                             <option value="Google">Google</option>
                             <option value="LinkedIn">LinkedIn</option>
