@@ -1,7 +1,9 @@
 import React,{useState} from 'react'
 import { HiOutlineMenu, HiOutlineSearch } from 'react-icons/hi'
-
+import { collection, query, where, getDocs } from "firebase/firestore";
 import chrmpLogo from '../../CHRMP Logo - Tagline.svg'
+import { db } from '../../RegistrationForm/firebase';
+import Search from '../Search';
 const Header = ({isSidebarOpen, setSidebarOpen}) => {
 
 //     const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -9,6 +11,8 @@ const Header = ({isSidebarOpen, setSidebarOpen}) => {
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
   };
+  const [serchValue , setSearchValue] = useState("")
+  const [searchResults , setSearchResults] = useState ("")
 
 //   const isSidebarOpen = props
 
@@ -16,7 +20,17 @@ const Header = ({isSidebarOpen, setSidebarOpen}) => {
 // console.log(isSidebarOpen);
 // setSidebarOpen(true);
 // console.log(isSidebarOpen);
-
+  // const handleSearch = async () => {
+  //   const collectionRef = collection(db, "Database");
+  //   const q = query(collectionRef, where("name", "==", setSearchValue));
+  //   try {
+  //     const querySnapshot = await getDocs(q);
+  //     const results = querySnapshot.docs.map((doc) => doc.data());
+  //     setSearchResults(results);
+  //   } catch (error) {
+  //     console.error("Error searching Firestore:", error);
+  //   }
+  // }
   return (
     //  isSidebarOpen? null : 
      (<div className='bg-[#F1F5F9] p-6 shadow-md rounded-t-xl border-b'>
@@ -32,9 +46,11 @@ const Header = ({isSidebarOpen, setSidebarOpen}) => {
             <input
             type="text"
             className="bg-[#DEE5ED] outline-none rounded-3xl pl-4 p-1 font-normal"
-            />
-            <HiOutlineSearch className='text-[#475569] text-sm'/>
+            value={serchValue} onChange={(e)=>setSearchValue(e.target.value)}/>
+            {console.log(serchValue)}
+            <HiOutlineSearch className='text-[#475569] text-sm' />
             </div>
+            {/* <Search data={searchResults}/> */}
                 
         </div>
     </div>)

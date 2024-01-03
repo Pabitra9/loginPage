@@ -67,6 +67,7 @@ const Tabulator = () => {
   const handleDeleteClick = async (id) => {
     const deleteValue = doc(db, 'Database', id);
     await deleteDoc(deleteValue);
+    alert("Do you really want to delete this data ?")
   };
 
   // Calculate total pages
