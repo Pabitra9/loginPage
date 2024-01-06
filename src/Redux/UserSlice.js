@@ -11,6 +11,7 @@ export const userSlice = createSlice({
     addUser : (state, action) => {
         state.currentUser = [action.payload];
     },
+    
   },
 })
 

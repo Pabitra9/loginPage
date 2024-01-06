@@ -169,11 +169,11 @@ function EditUser() {
                   <div className="flex flex-wrap gap-4 m-8">
                     <div className="w-1/3">
                       <label className="mb-2 font-medium">Program Enroll For</label>
-                      <input type="text" name="certificationProgram" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent"  value={currentDataFromFirebase.certificationProgram} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value })} />
+                      <input type="text" name="certificationProgram" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent"  value={currentDataFromFirebase.certificationProgram} onChange={(e) => setCurrentDataFromFirebase({currentDataFromFirebase, certificationProgram: e.target.value })} />
                       </div>
                       <div className="w-1/3">
                       <label className="mb-2 font-medium">Date of Registration</label>
-                      <input type="text" name="registrationDate" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.registrationDate} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value })}  />
+                      <input type="text" name="registrationDate" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.registrationDate} onChange={(e) => setCurrentDataFromFirebase({currentDataFromFirebase, registrationDate: e.target.value })}  />
                       </div>
                   </div>
               </div>
@@ -183,27 +183,27 @@ function EditUser() {
             <div className="flex flex-wrap gap-4 m-8">
             <div className="w-1/3">
               <label className="mb-2 font-medium">Education</label>
-              <input type="text" name="education" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.education} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value })} />
+              <input type="text" name="education" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.education} onChange={(e) => setCurrentDataFromFirebase({ currentDataFromFirebase, education: e.target.value })} />
               <label className="mb-2 font-medium">Total Year of Experience</label>
-              <input type="text" name="totalExperience" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.totalExperience} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value })}/>
+              <input type="text" name="totalExperience" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.totalExperience} onChange={(e) => setCurrentDataFromFirebase({ currentDataFromFirebase, totalExperience: e.target.value })}/>
               <label className="mb-2 font-medium">Relevent Experience in HR</label>
-              <input type="text" name="hrExperience" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.hrExperience} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value })}/>
+              <input type="text" name="hrExperience" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.hrExperience} onChange={(e) => setCurrentDataFromFirebase({ currentDataFromFirebase, hrExperience: e.target.value })}/>
             </div>
             <div className="w-1/3">
               <label className="mb-2 font-medium">Previous organization</label>
-              <input type="text" name="prevOrg" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.prevOrg} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value })} />
+              <input type="text" name="prevOrg" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.prevOrg} onChange={(e) => setCurrentDataFromFirebase({ currentDataFromFirebase, prevOrg: e.target.value })} />
               <label className="mb-2 font-medium">Current organization</label>
-              <input type="text" name="currentOrg" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.currentOrg} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value })} />
+              <input type="text" name="currentOrg" className="w-full mb-4 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.currentOrg} onChange={(e) => setCurrentDataFromFirebase({currentDataFromFirebase, currentOrg: e.target.value })} />
               <label className="mb-2 font-medium">Designation</label>
-              <input type="text" name="designation" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.designation} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value })} />
+              <input type="text" name="designation" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.designation} onChange={(e) => setCurrentDataFromFirebase({currentDataFromFirebase, designation: e.target.value })} />
             </div>
             <div className="w-1/3">
               <label className="mb-2 font-medium">Linkedin Profile URL</label>
-              <input type="text" name="linkedin" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.linkedin} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value })} />
+              <input type="text" name="linkedin" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.linkedin} onChange={(e) => setCurrentDataFromFirebase({currentDataFromFirebase, linkedin: e.target.value })} />
             </div>
             <div className="w-1/3">
               <label className="mb-2 font-medium">How Did you find us?</label>
-              <input type="text" name="howFound" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.howFound} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value })} />
+              <input type="text" name="howFound" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.howFound} onChange={(e) => setCurrentDataFromFirebase({currentDataFromFirebase, howFound: e.target.value })} />
             </div>
         </div>
             <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleSubmit}>Update</button>

@@ -1,8 +1,9 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import { HiOutlineMenu, HiOutlineSearch } from 'react-icons/hi'
 import { collection, query, where, getDocs } from "firebase/firestore";
 import chrmpLogo from '../../CHRMP Logo - Tagline.svg'
 import { db } from '../../RegistrationForm/firebase';
+
 import Search from '../Search';
 const Header = ({isSidebarOpen, setSidebarOpen}) => {
 
@@ -12,27 +13,43 @@ const Header = ({isSidebarOpen, setSidebarOpen}) => {
     setSidebarOpen(!isSidebarOpen);
   };
   const [serchValue , setSearchValue] = useState("")
-  const [searchResults , setSearchResults] = useState ("")
-
+  const [searchResults , setSearchResults] = useState ([])
 //   const isSidebarOpen = props
 
 
 // console.log(isSidebarOpen);
 // setSidebarOpen(true);
 // console.log(isSidebarOpen);
-  // const handleSearch = async () => {
-  //   const collectionRef = collection(db, "Database");
-  //   const q = query(collectionRef, where("name", "==", setSearchValue));
-  //   try {
-  //     const querySnapshot = await getDocs(q);
-  //     const results = querySnapshot.docs.map((doc) => doc.data());
-  //     setSearchResults(results);
-  //   } catch (error) {
-  //     console.error("Error searching Firestore:", error);
-  //   }
-  // }
+// useEffect(() => {
+  const fetchData = async () => {
+    if (serchValue.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+  
+    const usersRef = collection(db, 'Database');
+  
+    // Perform a case-insensitive search for names
+    const q = query(usersRef, where('name', '==', serchValue));
+    console.log(q);
+    
+    try {
+      const snapshot = await getDocs(q);
+      console.log(snapshot);
+      const results = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log(results);
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  // fetchData();
+// }, [serchValue]);
   return (
-    //  isSidebarOpen? null : 
      (<div className='bg-[#F1F5F9] p-6 shadow-md rounded-t-xl border-b'>
        
         <div className="text-2xl font-bold flex justify-between items-center gap-10">
@@ -48,9 +65,16 @@ const Header = ({isSidebarOpen, setSidebarOpen}) => {
             className="bg-[#DEE5ED] outline-none rounded-3xl pl-4 p-1 font-normal"
             value={serchValue} onChange={(e)=>setSearchValue(e.target.value)}/>
             {console.log(serchValue)}
-            <HiOutlineSearch className='text-[#475569] text-sm' />
+            <HiOutlineSearch className='text-[#475569] text-sm' onClick={()=>fetchData()}/>
             </div>
             {/* <Search data={searchResults}/> */}
+            
+            <ul>
+        {searchResults.map((result) => (
+          <li key={result.id}>{result.name}</li>
+        ))}
+      </ul>
+      
                 
         </div>
     </div>)
