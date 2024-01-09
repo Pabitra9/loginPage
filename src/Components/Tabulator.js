@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { HiOutlineArchive, HiPencilAlt } from 'react-icons/hi';
+import { useLocation } from 'react-router-dom';
 import { db } from '../RegistrationForm/firebase';
 import { getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
@@ -10,6 +11,10 @@ const Tabulator = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [jumpToPage, setJumpToPage] = useState('');
+
+  const location = useLocation();
+  const { searchResults } = location.state || {};
+  console.log(location.state);
 
   const handleJumpToPage = () => {
     const pageNumber = parseInt(jumpToPage, 10);
@@ -97,35 +102,67 @@ const Tabulator = () => {
           </tr>
         </thead>
         <tbody>
-          {currentPageData.map((item, index) => (
-            <tr key={item.id} className={index % 2 === 0 ? 'bg-[#F1F5F9] border-b border-t' : ''}>
-                           <td className="px-4 py-2 text-left">{item.name}</td>
-          <td className="px-4 py-2 text-left">
-             {item.email}
-              </td>
-              <td className="px-4 py-2 text-left">{item.course}</td>
-               <td className="px-4 py-2 text-center">
-                 <span className={`${item.status === 'Yes' ? 'text-green-500' : 'text-red-500'} py-1 px-3 font-bold`}>
-                   {item.status}
-                 </span>
-               </td>
-               <td className="px-4 py-2 text-center">
-                 <Link to = {`/edit/${item.id}`}>
-                 <button className="text-black py-2 px-3 rounded mr-2">
-                   <div className='flex justify-evenly items-center'>
-                     <HiPencilAlt className='text-lg text-blue-700' />
-                     <span>Edit</span>
-                   </div>
-                 </button>
-                 </Link>
-                 <button className="text-black py-2 px-3 rounded">
-                   <div className='flex justify-evenly items-center'>
-                     <HiOutlineArchive className='text-lg text-red-500 hover:text-white hover:bg-red-500 hover:shadow-red-500 hover:shadow-lg hover:p-1 hover:rounded-full' onClick={()=>handleDeleteClick(item.id)}/>
-                   </div>
-                </button>
-               </td>
-            </tr>
-          ))}
+        {searchResults ? (
+  searchResults.map((result, index) => (
+    <tr key={index} className={index % 2 === 0 ? 'bg-[#F1F5F9] border-b border-t' : ''}>
+      <td className="px-4 py-2 text-left capitalize">{result.name}</td>
+      <td className="px-4 py-2 text-left">{result.email}</td>
+      {console.log(result.email)}
+      <td className="px-4 py-2 text-left">{result.certificationProgram}</td>
+      {console.log(result.course)}
+      <td className="px-4 py-2 text-center">
+        <span className={`${result.status === 'Yes' ? 'text-green-500' : 'text-red-500'} py-1 px-3 font-bold`}>
+          {result.status}
+        </span>
+      </td>
+      <td className="px-4 py-2 text-center">
+        <Link to={`/edit/${result.id}`}>
+          <button className="text-black py-2 px-3 rounded mr-2">
+            <div className='flex justify-evenly items-center'>
+              <HiPencilAlt className='text-lg text-blue-700' />
+              <span>Edit</span>
+            </div>
+          </button>
+        </Link>
+        <button className="text-black py-2 px-3 rounded">
+          <div className='flex justify-evenly items-center'>
+            <HiOutlineArchive className='text-lg text-red-500 hover:text-white hover:bg-red-500 hover:shadow-red-500 hover:shadow-lg hover:p-1 hover:rounded-full' onClick={() => handleDeleteClick(result.id)} />
+          </div>
+        </button>
+      </td>
+    </tr>
+  ))
+) : (
+  currentPageData.map((item, index) => (
+    <tr key={item.id} className={index % 2 === 0 ? 'bg-[#F1F5F9] border-b border-t' : ''}>
+      <td className="px-4 py-2 text-left capitalize">{item.name}</td>
+      <td className="px-4 py-2 text-left">
+        {item.email}
+      </td>
+      <td className="px-4 py-2 text-left">{item.course}</td>
+      <td className="px-4 py-2 text-center">
+        <span className={`${item.status === 'Yes' ? 'text-green-500' : 'text-red-500'} py-1 px-3 font-bold`}>
+          {item.status}
+        </span>
+      </td>
+      <td className="px-4 py-2 text-center">
+        <Link to={`/edit/${item.id}`}>
+          <button className="text-black py-2 px-3 rounded mr-2">
+            <div className='flex justify-evenly items-center'>
+              <HiPencilAlt className='text-lg text-blue-700' />
+              <span>Edit</span>
+            </div>
+          </button>
+        </Link>
+        <button className="text-black py-2 px-3 rounded">
+          <div className='flex justify-evenly items-center'>
+            <HiOutlineArchive className='text-lg text-red-500 hover:text-white hover:bg-red-500 hover:shadow-red-500 hover:shadow-lg hover:p-1 hover:rounded-full' onClick={() => handleDeleteClick(item.id)} />
+          </div>
+        </button>
+      </td>
+    </tr>
+  ))
+)}
         </tbody>
       </table>
 

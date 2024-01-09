@@ -2,9 +2,10 @@ import React,{useEffect, useState} from 'react'
 import { HiOutlineMenu, HiOutlineSearch } from 'react-icons/hi'
 import { collection, query, where, getDocs } from "firebase/firestore";
 import chrmpLogo from '../../CHRMP Logo - Tagline.svg'
-import { db } from '../../RegistrationForm/firebase';
+import {db} from '../../RegistrationForm/firebase'
+import { useNavigate } from 'react-router-dom';
 
-import Search from '../Search';
+
 const Header = ({isSidebarOpen, setSidebarOpen}) => {
 
 //     const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -14,41 +15,42 @@ const Header = ({isSidebarOpen, setSidebarOpen}) => {
   };
   const [serchValue , setSearchValue] = useState("")
   const [searchResults , setSearchResults] = useState ([])
+  const navigate = useNavigate();
 //   const isSidebarOpen = props
 
 
 // console.log(isSidebarOpen);
 // setSidebarOpen(true);
 // console.log(isSidebarOpen);
-// useEffect(() => {
-  const fetchData = async () => {
-    if (serchValue.trim() === '') {
-      setSearchResults([]);
-      return;
-    }
-  
-    const usersRef = collection(db, 'Database');
-  
-    // Perform a case-insensitive search for names
-    const q = query(usersRef, where('name', '==', serchValue));
-    console.log(q);
-    
-    try {
-      const snapshot = await getDocs(q);
-      console.log(snapshot);
-      const results = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      console.log(results);
-      setSearchResults(results);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
+
+const trimmedSearchValue = serchValue.trim().toLowerCase(); 
+// console.log(trimmedSearchValue);
+  const handleSearch = async () => {
+   
+    const collection_ref = collection(db,"Database")
+    const q = query(collection_ref,where("name", ">=" , trimmedSearchValue),where ("name","<=", trimmedSearchValue + "\uf8fe"))
+    const doc_refs = await getDocs(q)
+    console.log(doc_refs);
+    const results = [];
+    console.log(results);
+    doc_refs.forEach((doc) => {
+      // const storedName = doc.data().name.toLowerCase()
+      // console.log(storedName);
+      // if (storedName === trimmedSearchValue) {
+        results.push({
+          id: doc.id,
+          ...doc.data(),
+          
+        });
+        
+      // }
+    });
+    setSearchResults(results);
+    navigate('/', { state: { searchResults: results } });
+    console.log(results);
+
   };
 
-  // fetchData();
-// }, [serchValue]);
   return (
      (<div className='bg-[#F1F5F9] p-6 shadow-md rounded-t-xl border-b'>
        
@@ -65,15 +67,15 @@ const Header = ({isSidebarOpen, setSidebarOpen}) => {
             className="bg-[#DEE5ED] outline-none rounded-3xl pl-4 p-1 font-normal"
             value={serchValue} onChange={(e)=>setSearchValue(e.target.value)}/>
             {console.log(serchValue)}
-            <HiOutlineSearch className='text-[#475569] text-sm' onClick={()=>fetchData()}/>
+            <HiOutlineSearch className='text-[#475569] text-sm' onClick={handleSearch}/>
             </div>
-            {/* <Search data={searchResults}/> */}
+            {console.log(searchResults)}
             
-            <ul>
+            {/* <ul>
         {searchResults.map((result) => (
-          <li key={result.id}>{result.name}</li>
+          <li className='capitalize' key={result.id}>{result.name}</li>
         ))}
-      </ul>
+      </ul> */}
       
                 
         </div>
