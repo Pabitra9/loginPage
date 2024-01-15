@@ -11,10 +11,11 @@ const Tabulator = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [jumpToPage, setJumpToPage] = useState('');
-
+  
   const location = useLocation();
   const { searchResults } = location.state || {};
-  console.log(location.state);
+  // console.log(location.state);
+  const displayData = searchResults || data;
 
   const handleJumpToPage = () => {
     const pageNumber = parseInt(jumpToPage, 10);
@@ -77,14 +78,16 @@ const Tabulator = () => {
   };
 
   // Calculate total pages
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const totalPages = Math.ceil(displayData.length / itemsPerPage);
+  // console.log(totalPages);
 
   // Calculate the index range for the current page
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
   // Get the data to display on the current page
-  const currentPageData = data.slice(startIndex, endIndex);
+  const currentPageData = displayData.slice(startIndex, endIndex);
+  // console.log(currentPageData);
 
   return (
     <div className="min-h-screen mx-auto p-4">
@@ -102,8 +105,8 @@ const Tabulator = () => {
           </tr>
         </thead>
         <tbody>
-        {searchResults ? (
-  searchResults.map((result, index) => (
+        {searchResults && searchResults.length > 0  ? (
+     searchResults.map((result, index) => (
     <tr key={index} className={index % 2 === 0 ? 'bg-[#F1F5F9] border-b border-t' : ''}>
       <td className="px-4 py-2 text-left capitalize">{result.name}</td>
       <td className="px-4 py-2 text-left">{result.email}</td>
@@ -132,7 +135,7 @@ const Tabulator = () => {
       </td>
     </tr>
   ))
-) : (
+) : currentPageData.length > 0 ? (
   currentPageData.map((item, index) => (
     <tr key={item.id} className={index % 2 === 0 ? 'bg-[#F1F5F9] border-b border-t' : ''}>
       <td className="px-4 py-2 text-left capitalize">{item.name}</td>
@@ -162,7 +165,14 @@ const Tabulator = () => {
       </td>
     </tr>
   ))
+) : (
+  <tr>
+    <td colSpan="5" className="px-4 py-2 text-center text-gray-500">
+      No results found.
+    </td>
+  </tr>
 )}
+
         </tbody>
       </table>
 
@@ -174,7 +184,7 @@ const Tabulator = () => {
             Page {currentPage} of {totalPages}
           </span>
           <span className="text-gray-500">
-            ({data.length} items in total)
+            ({displayData.length} items in total)
           </span>
         </div>
         <div className="flex">

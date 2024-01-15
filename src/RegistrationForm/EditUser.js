@@ -6,13 +6,15 @@ import { ref, uploadBytes ,getDownloadURL } from "firebase/storage";
 import { useParams } from "react-router-dom";
 import loginImg from "../login.jpg"
 import { useNavigate } from "react-router-dom";
+import { HiPlus } from "react-icons/hi";
 
 function EditUser() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [currentDataFromFirebase, setCurrentDataFromFirebase] = useState({});
-  // const [imageUrl, setImageUrl] = useState("");
+  const [newProfilePhoto, setNewProfilePhoto] = useState(null);
+  const [downloadPic , setDownloadPic] = useState (null)
   // const [editData, setEditData] = useState({
   //   name: "",
   //   dob: "",
@@ -51,6 +53,24 @@ function EditUser() {
     getDatasFromFirebase();
   }, [id]);
 
+  useEffect(() => {
+    // Actions to perform after downloadPic is updated
+    console.log(downloadPic);
+  }, [downloadPic]);
+  
+  
+  const handleFileChange = (e) => {
+    e.preventDefault();
+    setNewProfilePhoto(e.target.files[0]);
+  };
+  
+  newProfilePhoto && console.log(newProfilePhoto);
+  // const handleFileChange = (e) => {
+  //   e.preventDefault();
+  //   setCurrentDataFromFirebase({...currentDataFromFirebase, image: e.target.files[0]});
+  //   // console.log(newProfilePhoto);
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -66,11 +86,41 @@ function EditUser() {
 
       // You can add a success message or redirect the user here.
       // alert("Data updated successfully");
+      if (newProfilePhoto) {
+        await updateProfilePhoto();
+      }
       navigate('/')
     } catch (error) {
       console.error("Error updating data:", error);
     }
   };
+  const updateProfilePhoto = async () => {
+    try {
+      const storageRef = ref(storage, `image/${newProfilePhoto?.name}`); // Adjust the path as needed
+      // console.log(storageRef);
+    
+      await uploadBytes(storageRef, newProfilePhoto); // Upload the new profile photo
+      const downloadNewProfileUrl = await getDownloadURL(storageRef);
+      const updatedData = {
+        ...currentDataFromFirebase,
+        image: downloadNewProfileUrl,
+      };
+      await setDoc(doc(db, "Database", id), updatedData);
+
+      // Update the state or wherever you store currentDataFromFirebase
+      setCurrentDataFromFirebase(updatedData);
+      // setDownloadPic(downloadNewProfileUrl)
+      console.log(downloadNewProfileUrl);
+      
+      // console.log(newProfilePhoto);
+    
+    } catch (error) {
+      console.error("Error updating profile photo:", error);
+    }
+  };
+  console.log(id);
+  console.log(currentDataFromFirebase);
+  console.log(downloadPic);
 
   // const uploadImages = () => {
   //   if (imageUpload == null && idproof == null) return;
@@ -105,9 +155,25 @@ function EditUser() {
     <div className="h-screen w-screen flex items-center rounded-md shadow-md">
        {/* <h1 className="text-2xl font-bold mb-4">Edit User Data</h1> */}
       <div className="w-1/3 h-full  bg-[#2960A1] rounded-s-md shadow-lg">
-        <div className="flex items-center justify-center m-8">
-        <img src={currentDataFromFirebase.image} alt="User" className="w-48 h-48 rounded-full border-solid border-[#8DC162] border-4 object-cover" />
-        </div>
+        <div className="flex items-center justify-center m-8 ">
+          {newProfilePhoto ? (<img src={currentDataFromFirebase.image} alt="User" className="w-48 h-48 rounded-full border-solid border-[#8DC162] border-4 object-cover" />) : (<img src={currentDataFromFirebase.image } alt="User" className="w-48 h-48 rounded-full border-solid border-[#8DC162] border-4 object-cover" />)}
+        {/* {console.log(currentDataFromFirebase.image)} */}
+        
+       </div>
+       <div className="flex items-center justify-center m-8 bg-white p-2 gap-1" >
+       <label htmlFor="profilePhotoInput" className="cursor-pointer">
+            Edit Photo
+            <input
+              id="profilePhotoInput"
+              name="image"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </label>
+        <HiPlus className="text-lg" onClick={updateProfilePhoto}/>
+       </div>
         <div className="">
         <div className="flex flex-wrap gap-4 p-10">
                     <div className="w-full">

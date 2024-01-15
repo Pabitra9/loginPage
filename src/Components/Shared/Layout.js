@@ -8,7 +8,7 @@ function Layout({ children }) {
 //     setSidebarOpen(!isSidebarOpen);
 //   };
 
-console.log(isSidebarOpen);
+// console.log(isSidebarOpen);
   return (
     <>
     <div className={`min-h-screen bg-[#2960a1] flex`} >
