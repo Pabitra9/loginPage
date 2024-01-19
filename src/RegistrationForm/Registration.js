@@ -713,7 +713,7 @@ console.log(errors);
                     {/* <!-- Your Id Proof Field --> */}
                     <div className="mb-4">
                         <label for="idProof" className="block text-[#5D6572] font-semibold mb-2 text-sm">Your Id Proof <span className="text-[#ff0000]">*</span></label>
-                        <input type="file" id="idProof" name="idProof" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required onChange={(e)=>{ e.preventDefault()
+                        <input type="file" id="idProof" name="idProof" accept=".pdf , .docx" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required onChange={(e)=>{ e.preventDefault()
                             setIdproof(e.target.files[0])}} />
                           {/* {<p className="text-[#ff0000]">{errors.idProof}</p>}   */}
                     </div>

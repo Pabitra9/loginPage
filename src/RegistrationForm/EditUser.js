@@ -4,9 +4,8 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { storage  } from "./firebase";
 import { ref, uploadBytes ,getDownloadURL } from "firebase/storage";
 import { useParams } from "react-router-dom";
-import loginImg from "../login.jpg"
 import { useNavigate } from "react-router-dom";
-import { HiPlus } from "react-icons/hi";
+import { HiDocument, HiOutlineDocument, HiPlus } from "react-icons/hi";
 
 function EditUser() {
   const { id } = useParams();
@@ -14,27 +13,7 @@ function EditUser() {
 
   const [currentDataFromFirebase, setCurrentDataFromFirebase] = useState({});
   const [newProfilePhoto, setNewProfilePhoto] = useState(null);
-  const [downloadPic , setDownloadPic] = useState (null)
-  // const [editData, setEditData] = useState({
-  //   name: "",
-  //   dob: "",
-  //   email: "",
-  // });
-  
-  // useEffect(() => {
-  //   const getImageUrl = async () => {
-  //     try {
-  //       const storageRef = ref(storage, `image/${imageUrl.name}`); // Replace with your image path
-  //       const url = await getDownloadURL(storageRef);
-  //       setImageUrl(url);
-  //       {console.log(setImageUrl);}
-  //     } catch (error) {
-  //       console.error('Error fetching image:', error);
-  //     }
-  //   };
-
-  //   getImageUrl();
-  // }, [storage]);
+  const [previewImage, setPreviewImage] = useState(null);
 
 
   useEffect(() => {
@@ -53,39 +32,34 @@ function EditUser() {
     getDatasFromFirebase();
   }, [id]);
 
-  useEffect(() => {
-    // Actions to perform after downloadPic is updated
-    console.log(downloadPic);
-  }, [downloadPic]);
-  
-  
   const handleFileChange = (e) => {
     e.preventDefault();
     setNewProfilePhoto(e.target.files[0]);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewImage(reader.result);
+    };
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+
   };
+
+  
   
   newProfilePhoto && console.log(newProfilePhoto);
-  // const handleFileChange = (e) => {
-  //   e.preventDefault();
-  //   setCurrentDataFromFirebase({...currentDataFromFirebase, image: e.target.files[0]});
-  //   // console.log(newProfilePhoto);
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Ensure that the data you want to update is in the correct format.
     const updatedData = currentDataFromFirebase;
+    console.log(updatedData);
 
     try {
       // Update the document in the Firestore database.
       await setDoc(doc(db, "Database", id), updatedData);
-
-      // Handle image uploads if needed (uncomment the code if necessary).
-      // uploadImages();
-
-      // You can add a success message or redirect the user here.
-      // alert("Data updated successfully");
       if (newProfilePhoto) {
         await updateProfilePhoto();
       }
@@ -105,6 +79,7 @@ function EditUser() {
         ...currentDataFromFirebase,
         image: downloadNewProfileUrl,
       };
+      console.log(updatedData);
       await setDoc(doc(db, "Database", id), updatedData);
 
       // Update the state or wherever you store currentDataFromFirebase
@@ -119,44 +94,13 @@ function EditUser() {
     }
   };
   console.log(id);
-  console.log(currentDataFromFirebase);
-  console.log(downloadPic);
-
-  // const uploadImages = () => {
-  //   if (imageUpload == null && idproof == null) return;
-
-  //   const imgRef = ref(storage, `image/${imageUpload.name}`);
-  //   uploadBytes(imgRef, imageUpload);
-
-  //   const idRef = ref(storage, `idCopy/${idproof.name}`);
-  //   uploadBytes(idRef, idproof);
-  // };
-
-  // Add your state and event handling logic for the editData, imageUpload, and idproof here.
-
-  // return (
-    // <div className="container min-h-screen mx-auto p-4">
-    //  
-    //   <form onSubmit={handleSubmit}>
-    //     <div>
-    //       <label>Name:</label>
-    //       <input
-    //         type="text"
-    //         name="name"
-    //         value={currentDataFromFirebase.name}
-    //         onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value }) }
-    //       />
-    //     </div>
-
-
- // App.js
 
   return (
     <div className="h-screen w-screen flex items-center rounded-md shadow-md">
        {/* <h1 className="text-2xl font-bold mb-4">Edit User Data</h1> */}
       <div className="w-1/3 h-full  bg-[#2960A1] rounded-s-md shadow-lg">
         <div className="flex items-center justify-center m-8 ">
-          {newProfilePhoto ? (<img src={currentDataFromFirebase.image} alt="User" className="w-48 h-48 rounded-full border-solid border-[#8DC162] border-4 object-cover" />) : (<img src={currentDataFromFirebase.image } alt="User" className="w-48 h-48 rounded-full border-solid border-[#8DC162] border-4 object-cover" />)}
+          {previewImage ? (<img src={previewImage} alt="User" className="w-48 h-48 rounded-full border-solid border-[#8DC162] border-4 object-cover" />) : (<img src={currentDataFromFirebase.image } alt="User" className="w-48 h-48 rounded-full border-solid border-[#8DC162] border-4 object-cover" />)}
         {/* {console.log(currentDataFromFirebase.image)} */}
         
        </div>
@@ -188,9 +132,16 @@ function EditUser() {
                       <label className="mb-2 text-white font-semibold">Alternative Phone No.</label>
                     <input type="text" name="alternativePhone" className="w-full mb-2 border-b-2 text-white border-white bg-transparent outline-none" value={currentDataFromFirebase.alternativePhone} onChange={(e) => setCurrentDataFromFirebase({...currentDataFromFirebase, alternativePhone: e.target.value })}/>
                     </div>
-                  </div>
-        </div>
-      </div>
+                  </div>  
+              </div>
+                   <div className="flex justify-center items-center">
+                        <div className="w-72 h-20 border-2 border-solid border-white rounded-md">
+                            {/* <HiDocument className="w-32 h-20"/> */}
+                        </div>
+                   {/* <object data={currentDataFromFirebase.idProof} type="application/pdf" width="100" height="200"></object> */}
+
+                   </div>
+            </div>
       <div className="w-full h-full overflow-y-scroll bg-gray-100 rounded-e-md shadow-md">
       <div className="flex flex-wrap gap-4 m-10 mb-0">
               <div className="w-full">
@@ -279,58 +230,6 @@ function EditUser() {
     </div>
   </div>
   );
-
-
-
-
-
-// export default App;
-
-
-        {/* <div>
-          <label>Date of Birth:</label>
-          <input
-            type="date"
-            name="dob"
-            value={editData.dob}
-            onChange={(e) => setEditData({ ...editData, dob: e.target.value })}
-          />
-        </div>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={editData.email}
-            onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-          />
-        </div>
-        <div>
-          <label>Phone:</label>
-          <input
-            type="email"
-            name="phone"
-            value={editData.phone}
-            onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-          />
-        </div> */}
-        
-        {/* Add input fields for other data fields here */}
-
-      //  
-      {/* // </form> */}
-
-      {/* Display user data */}
-  //     <div>
-  //       <h2>User Data:</h2>
-  //       <p>Name: {currentDataFromFirebase.name}</p>
-  //       <p>Date of Birth: {currentDataFromFirebase.dob}</p>
-  //       <p>Email: {currentDataFromFirebase.email}</p>
-  //       <p>Phone: {currentDataFromFirebase.phone}</p>
-  //       {/* Add paragraphs for other data fields here */}
-  //     </div>
-  //   </div>
-  // );
 }
 
 export default EditUser;

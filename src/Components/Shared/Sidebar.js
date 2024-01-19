@@ -1,9 +1,37 @@
 import React from 'react';
 import { HiMenu, HiOutlineLogout, HiViewGrid, HiX } from 'react-icons/hi';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate  } from 'react-router-dom';
+import { firebaseAuth } from '../../RegistrationForm/firebase';
+import { signOut } from 'firebase/auth';
+import { useEffect } from 'react';
 import profilePic from '../../Profile.png'
 const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogOut = async () => {
+    try {
+      await signOut(firebaseAuth); // Sign the user out using Firebase auth
+      // Additional cleanup or state changes can be done here if needed
+      navigate('/login', { replace: true }); // Redirect to the login page and replace history
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
+  // useEffect(() => {
+  //   const unblock = history.block((location, action) => {
+  //     if (action === 'POP' && location.pathname === '/logout') {
+  //       console.log("You can't go back to Logout!");
+  //       return false;
+  //     }
+  //     return true;
+  //   });
+
+  //   return () => {
+  //     unblock();
+  //   };
+  // }, [history]);
 
   return (
     <div className="flex flex-col w-64 p-3 text-white relative">
@@ -15,11 +43,11 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
             </div>
       {/* <h1 className=" text-2xl font-semibold m-5 pb-4 ">Sidebar</h1> */}
       <div className="flex-1 ">
-          <Link to={'/'}>
-        <div className={`flex pl-10 items-center gap-1 p-3 m-1 ${location.pathname === '/' ? 'bg-slate-400 rounded-md' : 'hover:bg-slate-400 hover:rounded-md'}`}>
+          <Link to={'/dashboard'}>
+        <div className={`flex pl-10 items-center gap-1 p-3 m-1 ${location.pathname === '/dashboard' ? 'bg-slate-400 rounded-md' : 'hover:bg-slate-400 hover:rounded-md'}`}>
             <HiViewGrid className="text-lg" />
           <span>
-            <Link to={'/'}>Dashboard</Link>
+            Dashboard
           </span>
         </div>
           </Link>
@@ -28,7 +56,7 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
         <div className={`flex pl-10 items-center gap-1 p-3 m-1 ${location.pathname === '/menu1' ? 'bg-slate-400 rounded-md' : 'hover:bg-slate-400 hover:rounded-md'}`}>
             <HiMenu className="text-lg" />
           <span>
-            <Link to={'/menu1'}>Menu1</Link>
+            Menu1
           </span>
         </div>
           </Link>
@@ -37,20 +65,18 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
         <div className={`flex pl-10 items-center gap-1 p-3 m-1 ${location.pathname === '/menu2' ? 'bg-slate-400 rounded-md' : 'hover:bg-slate-400 hover:rounded-md'}`}>
             <HiMenu className="text-lg" />
           <span>
-            <Link to={'/menu2'}>Menu2</Link>
+            Menu2
           </span>
         </div>
           </Link>
       </div>
       {/* <div className="flex pl-10 items-center gap-1 p-3"> */}
-          <Link to={'/logout'}>
-        <div className="flex items-center justify-center gap-2 p-3 m-1 bg-[#8dc14e] rounded-md">
+          {/* <Link to={'/login'}> */}
+        <div className="flex items-center justify-center gap-2 p-3 m-1 bg-[#8dc14e] rounded-md cursor-pointer" onClick={handleLogOut}>
             <HiOutlineLogout className="text-lg font-extrabold" />
-          <Link to={'/logout'}>
             <span className='font-bold text-sm'>Log Out</span>
-          </Link>
         </div>
-          </Link>
+          {/* </Link> */}
       {/* </div> */}
     </div>
   );

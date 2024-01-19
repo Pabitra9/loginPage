@@ -1,5 +1,4 @@
 import { Link, Navigate } from 'react-router-dom';
-
 import { useState } from 'react';
 import loginPic from '../Group.svg'
 import vector from '../Vector 636.svg'
@@ -14,9 +13,14 @@ import { addUser } from '../Redux/UserSlice';
 function LoginPage() {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [inputEmail,setInputEmail] = useState(); 
-    const [inputPassword,setInputPassword] = useState(); 
+  const [inputPassword,setInputPassword] = useState();
+  const [errorMessage, setErrorMessage] = useState(""); 
+
 
     const userDispatch = useDispatch()
+    const handleInputChange = () => {
+      setErrorMessage("");
+    };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -42,6 +46,7 @@ function LoginPage() {
             })
       } catch (error) {
           console.error(error)
+          setErrorMessage("Invalid login credentials");
       // }
   }
   };
@@ -53,7 +58,7 @@ function LoginPage() {
     <img src={circle} className='absolute top-[90px] left-[45%] w-16'/>
     <img src={diamond2} className='absolute top-[80px] left-[55%] w-16'/>
 
-    {isLoggedIn && <Navigate to="/"/>}
+    
       {/* Left Partition for Image */}
       <div className="md:w-2/4 mb-4 md:mb-0 pr-12">
         <img src={loginPic} className="max-h-72 max-w-full mx-auto"/>
@@ -62,6 +67,7 @@ function LoginPage() {
       {/* Right Partition for Login Form */}
       <div className="md:w-1/4 rounded-lg shadow-lg p-8 bg-white ml-14">
         <h2 className="text-2xl font-semibold mb-4">Login</h2>
+        {isLoggedIn ? (<Navigate to="/dashboard"/>) : (<p className='text-red-600'>{errorMessage}</p>) }
         <form >
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="email" >
@@ -73,7 +79,7 @@ function LoginPage() {
               id="email"
               name="email"
               placeholder="Email"
-              onChange={(e) => {setInputEmail(e.target.value)}}
+              onChange={(e) => {setInputEmail(e.target.value);handleInputChange()}}
             />
           </div>
           <div className="mb-4">
@@ -86,7 +92,7 @@ function LoginPage() {
               id="password"
               name="password"
               placeholder="Password"
-              onChange={(e) => {setInputPassword(e.target.value)}}
+              onChange={(e) => {setInputPassword(e.target.value);handleInputChange()}}
             />
           </div>
           <button
