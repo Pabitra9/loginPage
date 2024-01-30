@@ -31,7 +31,7 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
         ...doc.data(),
       }));
       setSearchResults(results);
-      navigate('/', { state: { searchResults: results  } });
+      navigate('/dashboard', { state: { searchResults: results  } });
     // }
     // else{
     //   setSearchResults([])

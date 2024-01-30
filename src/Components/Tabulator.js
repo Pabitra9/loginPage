@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { HiOutlineArchive, HiPencilAlt } from 'react-icons/hi';
 import { useLocation } from 'react-router-dom';
 import { db } from '../RegistrationForm/firebase';
-import { getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
+import { getDocs, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 
 const Tabulator = () => {
@@ -11,11 +11,40 @@ const Tabulator = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [jumpToPage, setJumpToPage] = useState('');
+  const statusOptions = ['Open', 'In Progress', 'Completed'];
+  
+  // const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
+
   
   const location = useLocation();
   const { searchResults } = location.state || {};
   // console.log(location.state);
   const displayData = searchResults || data;
+
+  const handleStatusChange = async (e, itemId) => {
+    e.preventDefault();
+    console.log("itemId :" ,itemId);
+    
+    const newStatus = e.target.value;
+  
+    console.log("New Status:", newStatus);
+  
+    // Update the status in the local state using the functional form of setData
+    setData(prevData => {
+      console.log("Previous Data:", prevData);
+      
+      return prevData.map(item =>
+        item.id === itemId ? { ...item, status: newStatus } : item
+        );
+      });
+      
+      // Update the status in the Firestore database
+      const itemDocRef = doc(db, 'Database', itemId);
+      await updateDoc(itemDocRef, { status: newStatus });
+  };
+  
+  
+  
 
   const handleJumpToPage = () => {
     const pageNumber = parseInt(jumpToPage, 10);
@@ -25,7 +54,10 @@ const Tabulator = () => {
     }
   };
 
-  const [currentUserRole, setCurrentUserRole] = useState();
+  const [currentUserRole, setCurrentUserRole] = useState(()=>{
+    const storedRole = localStorage.getItem('currentUserRole');
+    return storedRole || '';
+  });
   const user = useSelector((state) => state.user.currentUser);
 
   const userCollectionRef = collection(db, 'UserCredential');
@@ -38,10 +70,14 @@ const Tabulator = () => {
         filteredUserRole.forEach((e) => {
           if (e.email === user[0].email) {
             setCurrentUserRole(e.role);
+            // setCurrentUserRole(newRole);
+            // Save the user role to localStorage
+            localStorage.setItem('currentUserRole', e.role);
           }
         });
       } catch (error) {
         console.error(error);
+        
       }
     };
 
@@ -92,8 +128,8 @@ const Tabulator = () => {
   return (
     <div className="min-h-screen mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Data Table</h1>
-      <h1 className="text-2xl font-bold mb-4">{currentUserRole}</h1>
-
+        <h1 className="text-2xl font-bold mb-4">{currentUserRole}</h1>
+        
       <table className="min-w-full bg-white rounded-lg shadow-lg">
         <thead>
           <tr>
@@ -113,11 +149,20 @@ const Tabulator = () => {
       {console.log(result.email)}
       <td className="px-4 py-2 text-left">{result.certificationProgram}</td>
       {console.log(result.course)}
-      <td className="px-4 py-2 text-center">
-        <span className={`${result.status === 'Yes' ? 'text-green-500' : 'text-red-500'} py-1 px-3 font-bold`}>
-          {result.status}
-        </span>
-      </td>
+  <td className="px-4 py-2 text-center">
+  <select
+    value={result.status}
+    onChange={(e) => handleStatusChange(e, result.id)} // or handleStatusChange(e, result.id) for searchResults
+    className="px-2 py-1 border rounded"
+    >
+    {statusOptions.map((option) => (
+      <option key={option} value={option}>
+        {option}
+      </option>
+    ))}
+  </select>
+  </td>
+
       <td className="px-4 py-2 text-center">
         <Link to={`/edit/${result.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">
@@ -144,10 +189,21 @@ const Tabulator = () => {
       </td>
       <td className="px-4 py-2 text-left">{item.course}</td>
       <td className="px-4 py-2 text-center">
-        <span className={`${item.status === 'Yes' ? 'text-green-500' : 'text-red-500'} py-1 px-3 font-bold`}>
-          {item.status}
-        </span>
-      </td>
+    <select
+    value={item.status}
+    onChange={(e) => handleStatusChange(e, item.id)} // or handleStatusChange(e, result.id) for searchResults
+    className="px-2 py-1 border rounded"
+    >
+    {statusOptions.map((option,index) => (
+      <option key={option} 
+      value={option}
+      style={{ backgroundColor: index % 2 === 0 ? '#F1F5F9' : '#8DC162' }}>
+        {option}
+      </option>
+    ))}
+    </select>
+    </td>
+
       <td className="px-4 py-2 text-center">
         <Link to={`/edit/${item.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">

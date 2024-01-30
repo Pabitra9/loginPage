@@ -11,14 +11,14 @@ import ThankYouPage from "./Components/ThankYouPage";
 
 const Router = () => {
   const routes = useRoutes([
-    { path: '/login', element: <LoginPage /> },
+    { path: '/', element: <LoginPage /> },
     { path: '/form', element: <Registration /> },
     { path: '/edit/:id', element: <EditUser /> },
     { path: '/thankyouPage', element: <ThankYouPage /> },
-    {
-      path: '/',
-      element: <Navigate to="/login" />,
-    },
+    // {
+    //   path: '/',
+    //   element: <Navigate to="/login" />,
+    // },
     {
       path: '/dashboard',
       element: (
