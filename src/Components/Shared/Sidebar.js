@@ -13,7 +13,7 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
     try {
       await signOut(firebaseAuth); // Sign the user out using Firebase auth
       // Additional cleanup or state changes can be done here if needed
-      navigate('/login', { replace: true }); // Redirect to the login page and replace history
+      navigate('/', { replace: true }); // Redirect to the login page and replace history
     } catch (error) {
       console.error('Error logging out:', error);
     }
