@@ -25,7 +25,7 @@ function EditUser() {
           setCurrentDataFromFirebase(docSnap.data());
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.log(error);
       }
     }
 
