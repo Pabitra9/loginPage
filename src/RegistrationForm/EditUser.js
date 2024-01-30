@@ -63,9 +63,9 @@ function EditUser() {
       if (newProfilePhoto) {
         await updateProfilePhoto();
       }
-      navigate('/')
+      navigate('/dashboard')
     } catch (error) {
-      console.error("Error updating data:", error);
+      console.log(error);
     }
   };
   const updateProfilePhoto = async () => {

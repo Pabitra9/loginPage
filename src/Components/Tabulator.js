@@ -12,6 +12,8 @@ const Tabulator = () => {
   const itemsPerPage = 10;
   const [jumpToPage, setJumpToPage] = useState('');
   const statusOptions = ['Open', 'In Progress', 'Completed'];
+
+  // const navigate = useNavigate()
   
   // const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
 

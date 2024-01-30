@@ -31,13 +31,14 @@ function LoginPage() {
           .then((userCredential) => {
               // Signed in 
               const user = userCredential.user;
-              // console.log(user);
+              console.log(user);
               const filteredUser = {
                   email : user.email,
                   token : user.accessToken,
                   displayName : user.displayName,
                   userId : user.uid,
               }
+              {console.log(filteredUser)}
               if (filteredUser.token) {
                   console.log(filteredUser);
                   userDispatch(addUser(filteredUser))
