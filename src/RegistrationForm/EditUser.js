@@ -5,7 +5,7 @@ import { storage  } from "./firebase";
 import { ref, uploadBytes ,getDownloadURL } from "firebase/storage";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { HiDocument, HiOutlineDocument, HiPlus } from "react-icons/hi";
+import { HiPlus } from "react-icons/hi";
 
 function EditUser() {
   const { id } = useParams();

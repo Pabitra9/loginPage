@@ -37,6 +37,7 @@ function LoginPage() {
                   token : user.accessToken,
                   displayName : user.displayName,
                   userId : user.uid,
+                  // localStorage.setItem("")
               }
               {console.log(filteredUser)}
               if (filteredUser.token) {

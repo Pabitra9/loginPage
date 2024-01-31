@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HiOutlineMenu, HiOutlineSearch } from 'react-icons/hi';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import chrmpLogo from '../../CHRMP Logo - Tagline.svg';
@@ -38,6 +38,13 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
       
     // }
   };
+  useEffect(()=>{
+    if (!localStorage.getItem('userRole')) {
+      console.log('hauchi');
+      navigate('/')
+    }
+  },[])
+  
 
   const handleInputChange = (event) => {
     event.preventDefault();
