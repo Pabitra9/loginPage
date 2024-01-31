@@ -41,6 +41,7 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
   useEffect(()=>{
     if (!localStorage.getItem('userRole')) {
       console.log('hauchi');
+      alert('What are you doing without login')
       navigate('/')
     }
   },[])
