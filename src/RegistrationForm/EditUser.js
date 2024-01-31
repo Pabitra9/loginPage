@@ -52,6 +52,13 @@ function EditUser() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // const storedToken = localStorage.getItem('userToken');
+
+    // if (!storedToken) {
+    //   // User not logged in
+    //   // You might want to handle this case accordingly
+    //   return;
+    // }
 
     // Ensure that the data you want to update is in the correct format.
     const updatedData = currentDataFromFirebase;
@@ -59,13 +66,19 @@ function EditUser() {
 
     try {
       // Update the document in the Firestore database.
-      await setDoc(doc(db, "Database", id), updatedData);
+      const updateDocResponse = await setDoc(doc(db, "Database", id), updatedData);
+      console.log(updateDocResponse);
       if (newProfilePhoto) {
         await updateProfilePhoto();
       }
+      alert('Successfully Updated')
       navigate('/dashboard')
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+     console.log({...error}); 
+      if (error.code == 'permission-denied') {
+        alert("You don't have sufficient permission")
+      }
     }
   };
   const updateProfilePhoto = async () => {

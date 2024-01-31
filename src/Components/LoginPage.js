@@ -43,6 +43,8 @@ function LoginPage() {
                   console.log(filteredUser);
                   userDispatch(addUser(filteredUser))
                   setLoggedIn(true);
+                  // console.log(localStorage.setItem('userToken', filteredUser.token));
+                  
               }
             })
       } catch (error) {

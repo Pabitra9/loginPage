@@ -9,6 +9,7 @@ import Registration from "./RegistrationForm/Registration";
 import EditUser from "./RegistrationForm/EditUser";
 import ThankYouPage from "./Components/ThankYouPage";
 
+
 const Router = () => {
   const routes = useRoutes([
     { path: '/', element: <LoginPage /> },
