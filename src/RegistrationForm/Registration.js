@@ -324,6 +324,7 @@ function Registration() {
         designation : "",
         linkedin : "",
         howFound : "",
+        // status : "",
         // image : "",
         // idProof : "",
         certificationNumber : ""

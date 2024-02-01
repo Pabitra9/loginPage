@@ -11,7 +11,7 @@ const Tabulator = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [jumpToPage, setJumpToPage] = useState('');
-  const statusOptions = ['Open', 'In Progress', 'Completed'];
+  // const statusOptions = ['Open', 'In Progress', 'Completed'];
 
   // const navigate = useNavigate()
   
@@ -23,31 +23,27 @@ const Tabulator = () => {
   // console.log(location.state);
   const displayData = searchResults || data;
 
-  const handleStatusChange = async (e, itemId) => {
-    e.preventDefault();
-    console.log("itemId :" ,itemId);
+  // const handleStatusChange = async (e, itemId) => {
+  //   e.preventDefault();
+  //   console.log("itemId :" ,itemId);
     
-    const newStatus = e.target.value;
+  //   const newStatus = e.target.value;
   
-    console.log("New Status:", newStatus);
+  //   console.log("New Status:", newStatus);
   
-    // Update the status in the local state using the functional form of setData
-    setData(prevData => {
-      console.log("Previous Data:", prevData);
+  //   // Update the status in the local state using the functional form of setData
+  //   setData(prevData => {
+  //     console.log("Previous Data:", prevData);
       
-      return prevData.map(item =>
-        item.id === itemId ? { ...item, status: newStatus } : item
-        );
-      });
+  //     return prevData.map(item =>
+  //       item.id === itemId ? { ...item, status: newStatus } : item
+  //       );
+  //     });
       
-      // Update the status in the Firestore database
-      const itemDocRef = doc(db, 'Database', itemId);
-      await updateDoc(itemDocRef, { status: newStatus });
-  };
-  
-  
-  
-
+  //     // Update the status in the Firestore database
+  //     const itemDocRef = doc(db, 'Database', itemId);
+  //     await updateDoc(itemDocRef, { status: newStatus });
+  // };
   const handleJumpToPage = () => {
     const pageNumber = parseInt(jumpToPage, 10);
     if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalPages) {
@@ -107,6 +103,7 @@ const Tabulator = () => {
 
     fetchData();
   }, []);
+  console.log(data);
 
   const handleDeleteClick = async (id) => {
     const deleteValue = doc(db, 'Database', id);
@@ -152,21 +149,10 @@ const Tabulator = () => {
       <td className="px-4 py-2 text-left">{result.certificationProgram}</td>
       {console.log(result.course)}
   <td className="px-4 py-2 text-center">
-  <select
-    value={result.status}
-    onChange={(e) => handleStatusChange(e, result.id)} // or handleStatusChange(e, result.id) for searchResults
-    className="px-2 py-1 border rounded"
-    >
-    {statusOptions.map((option) => (
-      <option key={option} value={option}>
-        {option}
-      </option>
-    ))}
-  </select>
+    {result.status}
   </td>
-
       <td className="px-4 py-2 text-center">
-        <Link to={`/edit/${result.id}`}>
+       <Link to={`/edit/${result.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">
             <div className='flex justify-evenly items-center'>
               <HiPencilAlt className='text-lg text-blue-700' />
@@ -191,21 +177,8 @@ const Tabulator = () => {
       </td>
       <td className="px-4 py-2 text-left">{item.course}</td>
       <td className="px-4 py-2 text-center">
-    <select
-    value={item.status}
-    onChange={(e) => handleStatusChange(e, item.id)} // or handleStatusChange(e, result.id) for searchResults
-    className="px-2 py-1 border rounded"
-    >
-    {statusOptions.map((option,index) => (
-      <option key={option} 
-      value={option}
-      style={{ backgroundColor: index % 2 === 0 ? '#F1F5F9' : '#8DC162' }}>
-        {option}
-      </option>
-    ))}
-    </select>
+        {item.status}
     </td>
-
       <td className="px-4 py-2 text-center">
         <Link to={`/edit/${item.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">

@@ -52,7 +52,7 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
         </div>
           </Link>
 
-          <Link to={'/menu1'}>
+          {/* <Link to={'/menu1'}>
         <div className={`flex pl-10 items-center gap-1 p-3 m-1 ${location.pathname === '/menu1' ? 'bg-slate-400 rounded-md' : 'hover:bg-slate-400 hover:rounded-md'}`}>
             <HiMenu className="text-lg" />
           <span>
@@ -68,7 +68,7 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
             Menu2
           </span>
         </div>
-          </Link>
+          </Link> */}
       </div>
       {/* <div className="flex pl-10 items-center gap-1 p-3"> */}
           {/* <Link to={'/login'}> */}

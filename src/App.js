@@ -1,12 +1,14 @@
 import React from 'react'
-import LoginPage from './Components/LoginPage'
-import Dashboard from './Dashboard'
 import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from './Components/Shared/AuthContext'
 import Router from './Router'
+
 const App = () => {
   return (
     <BrowserRouter>
-    <Router/>
+      <AuthProvider>
+        <Router />
+      </AuthProvider>
     </BrowserRouter>
   )
 }

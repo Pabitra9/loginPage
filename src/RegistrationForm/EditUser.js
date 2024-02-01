@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { db } from "./firebase";
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc,updateDoc } from 'firebase/firestore';
 import { storage  } from "./firebase";
 import { ref, uploadBytes ,getDownloadURL } from "firebase/storage";
 import { useParams } from "react-router-dom";
@@ -14,6 +14,16 @@ function EditUser() {
   const [currentDataFromFirebase, setCurrentDataFromFirebase] = useState({});
   const [newProfilePhoto, setNewProfilePhoto] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const statusOptions = ['Open', 'In Progress', 'Completed'];
+  
+  const handleStatusChange = (e) => {
+    e.preventDefault();
+    const updatedData = {
+      ...currentDataFromFirebase,
+      status: e.target.value,
+    };
+    setCurrentDataFromFirebase(updatedData);
+  };
 
 
   useEffect(() => {
@@ -52,7 +62,7 @@ function EditUser() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // const storedToken = localStorage.getItem('userToken');
+    
 
     // if (!storedToken) {
     //   // User not logged in
@@ -66,11 +76,18 @@ function EditUser() {
 
     try {
       // Update the document in the Firestore database.
-      const updateDocResponse = await setDoc(doc(db, "Database", id), updatedData);
+      const updateDocResponse = await updateDoc(doc(db, "Database", id), updatedData);
       console.log(updateDocResponse);
+
       if (newProfilePhoto) {
         await updateProfilePhoto();
       }
+
+      if (currentDataFromFirebase.status !== currentDataFromFirebase.statusInFirestore) {
+        const itemDocRef = doc(db, 'Database', id);
+        await updateDoc(itemDocRef, { status: currentDataFromFirebase.status });
+      }
+
       alert('Successfully Updated')
       navigate('/dashboard')
     } catch (error) {
@@ -168,6 +185,20 @@ function EditUser() {
               {/* <label className="mb-2">Age</label> */}
               <div className="w-1/3">
               <input type="text" name="gender" className="w-full mb-2 border-b-2 outline-none bg-transparent" placeholder="Gender" value={currentDataFromFirebase.gender} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, gender: e.target.value })}/>
+            </div>
+            <div className="w-1/3">
+              {/* <input type="text" name="gender" className="w-full mb-2 border-b-2 outline-none bg-transparent" placeholder="Gender" value={currentDataFromFirebase.gender} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, gender: e.target.value })}/> */}
+              <select
+              value={currentDataFromFirebase.status}
+              onChange={(e) => handleStatusChange(e,id)} // or handleStatusChange(e, result.id) for searchResults
+              className="px-2 py-1 border rounded"
+              >
+              {statusOptions.map((option) => (
+              <option key={option} value={option}>
+              {option}
+              </option>
+              ))}
+              </select> 
             </div>
           </div>
           <div>
