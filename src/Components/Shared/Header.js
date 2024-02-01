@@ -17,7 +17,7 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
 
   const handleSearch = async () => {
     const trimmedSearchValue = searchValue.trim().toLowerCase();
-
+    console.log(trimmedSearchValue);
     if (trimmedSearchValue !== '') {
       const collectionRef = collection(db, 'Database');
       const q = query(
@@ -35,25 +35,8 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
      }
     else{
       setSearchResults([])
-      
     }
   };
-  // useEffect(() => {
-  //   if (!localStorage.getItem('currentUserRole')) {
-  //     console.log('hauchi');
-      
-  //     // Adding a delay of 2000 milliseconds (2 seconds) using setTimeout
-  //     const timeoutId = setTimeout(() => {
-  //       // alert('What are you doing without login');
-  //       navigate('/');
-  //     }, 2000);
-  
-  //     // Clear the timeout if the component unmounts before the delay completes
-  //     return () => clearTimeout(timeoutId);
-  //   }
-  // }, []);
-  
-  
 
   const handleInputChange = (event) => {
     event.preventDefault();

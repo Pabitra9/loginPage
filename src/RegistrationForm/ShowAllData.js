@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { db } from "./firebase";
-import { doc, getDoc, setDoc,updateDoc } from 'firebase/firestore';
-import { storage  } from "./firebase";
-import { ref, uploadBytes ,getDownloadURL } from "firebase/storage";
+import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { HiPlus } from "react-icons/hi";
 
-function EditUser() {
+function ShowAllData() {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const [currentDataFromFirebase, setCurrentDataFromFirebase] = useState({});
   const [newProfilePhoto, setNewProfilePhoto] = useState(null);
@@ -42,88 +37,88 @@ function EditUser() {
     getDatasFromFirebase();
   }, [id]);
 
-  const handleFileChange = (e) => {
-    e.preventDefault();
-    setNewProfilePhoto(e.target.files[0]);
+//   const handleFileChange = (e) => {
+//     e.preventDefault();
+//     setNewProfilePhoto(e.target.files[0]);
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewImage(reader.result);
-    };
-    if (e.target.files[0]) {
-      reader.readAsDataURL(e.target.files[0]);
-    }
+//     const reader = new FileReader();
+//     reader.onloadend = () => {
+//       setPreviewImage(reader.result);
+//     };
+//     if (e.target.files[0]) {
+//       reader.readAsDataURL(e.target.files[0]);
+//     }
 
-  };
+//   };
 
   
   
   newProfilePhoto && console.log(newProfilePhoto);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
     
 
-    // if (!storedToken) {
-    //   // User not logged in
-    //   // You might want to handle this case accordingly
-    //   return;
-    // }
+//     // if (!storedToken) {
+//     //   // User not logged in
+//     //   // You might want to handle this case accordingly
+//     //   return;
+//     // }
 
-    // Ensure that the data you want to update is in the correct format.
-    const updatedData = currentDataFromFirebase;
-    console.log(updatedData);
+//     // Ensure that the data you want to update is in the correct format.
+//     const updatedData = currentDataFromFirebase;
+//     console.log(updatedData);
 
-    try {
-      // Update the document in the Firestore database.
-      const updateDocResponse = await updateDoc(doc(db, "Database", id), updatedData);
-      console.log(updateDocResponse);
+//     try {
+//       // Update the document in the Firestore database.
+//       const updateDocResponse = await updateDoc(doc(db, "Database", id), updatedData);
+//       console.log(updateDocResponse);
 
-      if (newProfilePhoto) {
-        await updateProfilePhoto();
-      }
+//       if (newProfilePhoto) {
+//         await updateProfilePhoto();
+//       }
 
-      if (currentDataFromFirebase.status !== currentDataFromFirebase.statusInFirestore) {
-        const itemDocRef = doc(db, 'Database', id);
-        await updateDoc(itemDocRef, { status: currentDataFromFirebase.status });
-      }
+//       if (currentDataFromFirebase.status !== currentDataFromFirebase.statusInFirestore) {
+//         const itemDocRef = doc(db, 'Database', id);
+//         await updateDoc(itemDocRef, { status: currentDataFromFirebase.status });
+//       }
 
-      alert('Successfully Updated')
-      navigate('/dashboard')
-    } catch (error) {
-      // console.log(error); 
-     console.log({...error}); 
-      if (error.code == 'permission-denied') {
-        alert("You don't have sufficient permission")
-      }
-    }
-  };
-  const updateProfilePhoto = async () => {
-    try {
-      const storageRef = ref(storage, `image/${newProfilePhoto?.name}`); // Adjust the path as needed
-      // console.log(storageRef);
+//       alert('Successfully Updated')
+//       navigate('/dashboard')
+//     } catch (error) {
+//       // console.log(error); 
+//      console.log({...error}); 
+//       if (error.code == 'permission-denied') {
+//         alert("You don't have sufficient permission")
+//       }
+//     }
+//   };
+//   const updateProfilePhoto = async () => {
+//     try {
+//       const storageRef = ref(storage, `image/${newProfilePhoto?.name}`); // Adjust the path as needed
+//       // console.log(storageRef);
     
-      await uploadBytes(storageRef, newProfilePhoto); // Upload the new profile photo
-      const downloadNewProfileUrl = await getDownloadURL(storageRef);
-      const updatedData = {
-        ...currentDataFromFirebase,
-        image: downloadNewProfileUrl,
-      };
-      console.log(updatedData);
-      await setDoc(doc(db, "Database", id), updatedData);
+//       await uploadBytes(storageRef, newProfilePhoto); // Upload the new profile photo
+//       const downloadNewProfileUrl = await getDownloadURL(storageRef);
+//       const updatedData = {
+//         ...currentDataFromFirebase,
+//         image: downloadNewProfileUrl,
+//       };
+//       console.log(updatedData);
+//       await setDoc(doc(db, "Database", id), updatedData);
 
-      // Update the state or wherever you store currentDataFromFirebase
-      setCurrentDataFromFirebase(updatedData);
-      // setDownloadPic(downloadNewProfileUrl)
-      console.log(downloadNewProfileUrl);
+//       // Update the state or wherever you store currentDataFromFirebase
+//       setCurrentDataFromFirebase(updatedData);
+//       // setDownloadPic(downloadNewProfileUrl)
+//       console.log(downloadNewProfileUrl);
       
-      // console.log(newProfilePhoto);
+//       // console.log(newProfilePhoto);
     
-    } catch (error) {
-      console.error("Error updating profile photo:", error);
-    }
-  };
-  console.log(id);
+//     } catch (error) {
+//       console.error("Error updating profile photo:", error);
+//     }
+//   };
+//   console.log(id);
 
   return (
     <div className="h-screen w-screen flex items-center rounded-md shadow-md">
@@ -134,7 +129,7 @@ function EditUser() {
         {/* {console.log(currentDataFromFirebase.image)} */}
         
        </div>
-       <div className="flex items-center justify-center m-8 bg-white p-2 gap-1" >
+       {/* <div className="flex items-center justify-center m-8 bg-white p-2 gap-1" >
        <label htmlFor="profilePhotoInput" className="cursor-pointer">
             Edit Photo
             <input
@@ -146,13 +141,14 @@ function EditUser() {
               onChange={handleFileChange}
             />
           </label>
-        <HiPlus className="text-lg" onClick={updateProfilePhoto}/>
-       </div>
+        {/* <HiPlus className="text-lg" /> 
+       </div> */}
         <div className="">
         <div className="flex flex-wrap gap-4 p-10">
                     <div className="w-full">
                       <label className="mb-2 text-white font-semibold ">Email</label>
-                      <input type="text" name="email" className="w-full mb-2 border-b-2 text-white border-white bg-transparent outline-none" value={currentDataFromFirebase.email} onChange={(e) => setCurrentDataFromFirebase({...currentDataFromFirebase, email: e.target.value })}/>
+                      <label className="mb-2 text-white font-semibold ">{currentDataFromFirebase.email}</label>
+                      <input type="text" name="email" className="w-full mb-2 border-b-2 text-white border-white bg-transparent outline-none" value={currentDataFromFirebase.email} />
                       </div>
                       <div className="w-full">
                       <label className="mb-2 text-white font-semibold">Phone No.</label>
@@ -268,7 +264,7 @@ function EditUser() {
               <input type="text" name="howFound" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.howFound} onChange={(e) => setCurrentDataFromFirebase({...currentDataFromFirebase, howFound: e.target.value })} />
             </div>
         </div>
-            <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleSubmit}>Update</button>
+            {/* <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleSubmit}>Update</button> */}
           </div>
         </div>
        </div>       
@@ -277,4 +273,4 @@ function EditUser() {
   );
 }
 
-export default EditUser;
+export default ShowAllData;

@@ -1,17 +1,51 @@
 import React from 'react';
-import { HiMenu, HiOutlineLogout, HiViewGrid, HiX } from 'react-icons/hi';
+import { HiOutlineLogout, HiViewGrid, HiX } from 'react-icons/hi';
 import { Link, useLocation, useNavigate  } from 'react-router-dom';
 import { firebaseAuth } from '../../RegistrationForm/firebase';
-import { signOut } from 'firebase/auth';
 import { useEffect } from 'react';
+import { signOut } from 'firebase/auth';
+import { getDocs, collection } from 'firebase/firestore';
+import { db } from '../../RegistrationForm/firebase';
 import profilePic from '../../Profile.png'
+
+
 const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [userCredentialFromFirebase,setUserCredentialFromFirebase] = ('')
+
+  const getDatasFromFirebase = async () => {
+    try {
+      const userCredentialCollection = collection(db, 'UserCredential');
+      const querySnapshot = await getDocs(userCredentialCollection);
+  
+      const userCredentialData = [];
+      console.log(userCredentialData);
+  
+      querySnapshot.forEach((doc) => {
+        if (doc.exists()) {
+          // Assuming you want to push the data to an array
+          userCredentialData.push(doc.data());
+        }
+      });
+  
+       setUserCredentialFromFirebase(userCredentialData);
+    } catch (error) {
+      console.error('Error getting documents: ', error);
+    }
+  };
+  
+  // Call the function in your useEffect
+  useEffect(() => {
+    getDatasFromFirebase();
+    console.log(userCredentialFromFirebase);
+  }, []);
 
   const handleLogOut = async () => {
     try {
-      await signOut(firebaseAuth); // Sign the user out using Firebase auth
+      await signOut(firebaseAuth); 
+      localStorage.clear();
+      // Sign the user out using Firebase auth
       // Additional cleanup or state changes can be done here if needed
       navigate('/', { replace: true }); // Redirect to the login page and replace history
     } catch (error) {
@@ -39,7 +73,7 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
         <div className='flex items-center justify-start my-8 pb-2 gap-4 border-b'>
             <img src={profilePic} className='w-10 cursor-pointer'/>
             <span className='text-xl font-semibold '>Pabitra Kumar</span>
-            
+            {console.log(userCredentialFromFirebase)}
             </div>
       {/* <h1 className=" text-2xl font-semibold m-5 pb-4 ">Sidebar</h1> */}
       <div className="flex-1 ">

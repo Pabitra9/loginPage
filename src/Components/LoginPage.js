@@ -1,5 +1,6 @@
+
 import { Link, Navigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import loginPic from '../Group.svg'
 import vector from '../Vector 636.svg'
 import ellipse from '../Ellipse 1184.svg'
@@ -10,12 +11,20 @@ import { firebaseAuth } from '../RegistrationForm/firebase';
 import { createUserWithEmailAndPassword , signInWithEmailAndPassword } from 'firebase/auth';
 import { useDispatch } from 'react-redux';
 import { addUser } from '../Redux/UserSlice';
+
 function LoginPage() {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [inputEmail,setInputEmail] = useState(); 
-  const [inputPassword,setInputPassword] = useState();
+  const [inputPassword,setInputPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); 
+  const isAuthenticated = localStorage.getItem('userToken')
 
+  useEffect(() => {
+    if(isAuthenticated){
+      setLoggedIn(true)
+    }
+  }, [isAuthenticated])
+  
 
     const userDispatch = useDispatch()
     const handleInputChange = () => {
@@ -44,7 +53,7 @@ function LoginPage() {
                   console.log(filteredUser);
                   userDispatch(addUser(filteredUser))
                   setLoggedIn(true);
-                  // console.log(localStorage.setItem('userToken', filteredUser.token));
+                  localStorage.setItem('userToken', filteredUser.token);
                   
               }
             })
@@ -113,4 +122,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default LoginPage;

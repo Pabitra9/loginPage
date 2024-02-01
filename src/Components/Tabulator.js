@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { HiOutlineArchive, HiPencilAlt } from 'react-icons/hi';
+import { HiOutlineArchive, HiPencilAlt, HiOutlineInformationCircle } from 'react-icons/hi';
 import { useLocation } from 'react-router-dom';
 import { db } from '../RegistrationForm/firebase';
 import { getDocs, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
+import ShowAllData from '../RegistrationForm/ShowAllData';
+
 
 const Tabulator = () => {
   const [data, setData] = useState([]);
@@ -103,7 +105,7 @@ const Tabulator = () => {
 
     fetchData();
   }, []);
-  console.log(data);
+  // console.log(data);
 
   const handleDeleteClick = async (id) => {
     const deleteValue = doc(db, 'Database', id);
@@ -152,7 +154,9 @@ const Tabulator = () => {
     {result.status}
   </td>
       <td className="px-4 py-2 text-center">
-       <Link to={`/edit/${result.id}`}>
+         {currentUserRole == 'tech'? (
+          <>
+          <Link to={`/edit/${result.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">
             <div className='flex justify-evenly items-center'>
               <HiPencilAlt className='text-lg text-blue-700' />
@@ -165,6 +169,18 @@ const Tabulator = () => {
             <HiOutlineArchive className='text-lg text-red-500 hover:text-white hover:bg-red-500 hover:shadow-red-500 hover:shadow-lg hover:p-1 hover:rounded-full' onClick={() => handleDeleteClick(result.id)} />
           </div>
         </button>
+        </>
+         ) : (
+         <>
+         <Link to={`/showAllData/${result.id}`}>
+          <button className="text-black py-2 px-3 rounded mr-2">
+            <div className='flex justify-evenly items-center'>
+              <HiOutlineInformationCircle className='text-lg text-blue-700' />
+              <span>Info</span>
+            </div>
+          </button>
+        </Link>
+         </> )}
       </td>
     </tr>
   ))
@@ -180,7 +196,9 @@ const Tabulator = () => {
         {item.status}
     </td>
       <td className="px-4 py-2 text-center">
-        <Link to={`/edit/${item.id}`}>
+      {currentUserRole == 'tech'? (
+          <>
+          <Link to={`/edit/${item.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">
             <div className='flex justify-evenly items-center'>
               <HiPencilAlt className='text-lg text-blue-700' />
@@ -193,6 +211,18 @@ const Tabulator = () => {
             <HiOutlineArchive className='text-lg text-red-500 hover:text-white hover:bg-red-500 hover:shadow-red-500 hover:shadow-lg hover:p-1 hover:rounded-full' onClick={() => handleDeleteClick(item.id)} />
           </div>
         </button>
+        </>
+         ) : (
+         <>
+         <Link to={`/showAllData/${item.id}`}>
+          <button className="text-black py-2 px-3 rounded mr-2">
+            <div className='flex justify-evenly items-center'>
+              <HiOutlineInformationCircle className='text-lg text-blue-700' />
+              <span>Info</span>
+            </div>
+          </button>
+        </Link>
+         </> )}
       </td>
     </tr>
   ))

@@ -1,5 +1,6 @@
+
 import React from "react";
-import { useRoutes, Navigate, useNavigate } from "react-router-dom";
+import { useRoutes, Navigate} from "react-router-dom";
 import Dashboard from "./Dashboard";
 import LoginPage from "./Components/LoginPage";
 import Layout from "./Components/Shared/Layout";
@@ -8,16 +9,17 @@ import Menu2 from "./Components/Menu2";
 import Registration from "./RegistrationForm/Registration";
 import EditUser from "./RegistrationForm/EditUser";
 import ThankYouPage from "./Components/ThankYouPage";
-import { firebaseAuth } from "./RegistrationForm/firebase";
+import ShowAllData from "./RegistrationForm/ShowAllData";
+// import { firebaseAuth } from "./RegistrationForm/firebase";
 
 const PrivateRoute = ({ element }) => {
   // e.preventDefault();
   // Implement your authentication logic here
-  console.log(element);
-  const isAuthenticated = firebaseAuth.currentUser !== null ;
-  console.log(isAuthenticated);
-  localStorage.setItem('isAuthenticated', isAuthenticated)
-  const storedAuth = localStorage.getItem('isAuthenticated')
+  // console.log(element);
+  // const isAuthenticated = firebaseAuth.currentUser !== null ;
+  // console.log(isAuthenticated);
+  // localStorage.setItem('isAuthenticated', isAuthenticated)
+  const isAuthenticated = localStorage.getItem('userToken')
   // const navigate = useNavigate()
   // if (!storedAuth) {
   //   <Navigate to={'/'}/>  
@@ -30,7 +32,9 @@ const PrivateRoute = ({ element }) => {
   //     return element  
   // }
 
-  return storedAuth ? (
+  // console.log({isAuthenticated})
+
+  return isAuthenticated ? (
     element
   ) : (
     <Navigate to="/" />
@@ -42,6 +46,7 @@ const Router = () => {
     { path: '/', element: <LoginPage /> },
     { path: '/form', element: <Registration /> },
     { path: '/edit/:id', element: <EditUser /> },
+    { path: '/showAllData/:id', element: <ShowAllData /> },
     { path: '/thankyouPage', element: <ThankYouPage /> },
     // {
     //   path: '/',
@@ -91,4 +96,4 @@ const Router = () => {
   return routes;
 };
 
-export default Router;
+export default Router;
