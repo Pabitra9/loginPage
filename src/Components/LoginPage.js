@@ -1,5 +1,5 @@
 
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useState,useEffect } from 'react';
 import loginPic from '../Group.svg'
 import vector from '../Vector 636.svg'
@@ -19,11 +19,27 @@ function LoginPage() {
   const [errorMessage, setErrorMessage] = useState(""); 
   const isAuthenticated = localStorage.getItem('userToken')
 
+  // useEffect(() => {
+  //   if(isAuthenticated){
+  //     setLoggedIn(true)
+  //   }
+  // }, [isAuthenticated])
+
   useEffect(() => {
-    if(isAuthenticated){
-      setLoggedIn(true)
-    }
-  }, [isAuthenticated])
+    const checkAuthentication = () => {
+      const storedToken = localStorage.getItem('userToken');
+      if (storedToken) {
+        setLoggedIn(true);
+      }
+    };
+  
+    checkAuthentication(); // Check on component mount
+  
+    return () => {
+      // Cleanup function to remove the user token from local storage on unmount
+      localStorage.removeItem('userToken');
+    };
+  }, []);
   
 
     const userDispatch = useDispatch()
@@ -46,7 +62,6 @@ function LoginPage() {
                   token : user.accessToken,
                   displayName : user.displayName,
                   userId : user.uid,
-                  // localStorage.setItem("")
               }
               {console.log(filteredUser)}
               if (filteredUser.token) {

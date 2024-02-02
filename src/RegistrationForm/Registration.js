@@ -425,9 +425,7 @@ console.log(errors);
     
              catch (error) {
                 setIsDataStored(false)
-                console.error('Error adding document:', error);
-             
-              
+                console.error('Error adding document:', error);  
                 
             } 
             }
@@ -435,55 +433,6 @@ console.log(errors);
             setIsDataStored(false)
             alert("please fill up all the feilds")
         }
-
-        // setFormData({name : "",
-        // dob : "",
-        // email : "",
-        // phone : "",
-        // alternativePhone : "",
-        // gender : "",
-        // streetAddress : "",
-        // addressLine2 : "",
-        // city : "",
-        // state : "",
-        // zipcode : "",
-        // country : "",
-        // certificationProgram : "",
-        // registrationDate : "",
-        // education : "",
-        // totalExperience : "",
-        // hrExperience : "",
-        // prevOrg : "",
-        // currentOrg : "",
-        // designation : "",
-        // linkedin : "",
-        // howFound : "",
-        // // image : "",
-        // // idProof : "",
-        // certificationNumber : ""})
-       
-  
-       
-        
-
-        // {console.log("Done")};
-        // setImgaeUpload(null)
-    // }
-        
-   
-        
-        // console.log(downloadUrl);
-        // const uploadImg = () =>{
-
-
-
-            // const storageRef = ref(storage, `image/${imageUpload.name}`);
-  
-            //  uploadBytes(storageRef, imageUpload);
-          
-            // const downloadUrl =  getDownloadURL(storageRef);
-            
-           
             
           }
 

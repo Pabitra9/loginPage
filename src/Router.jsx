@@ -10,29 +10,9 @@ import Registration from "./RegistrationForm/Registration";
 import EditUser from "./RegistrationForm/EditUser";
 import ThankYouPage from "./Components/ThankYouPage";
 import ShowAllData from "./RegistrationForm/ShowAllData";
-// import { firebaseAuth } from "./RegistrationForm/firebase";
 
 const PrivateRoute = ({ element }) => {
-  // e.preventDefault();
-  // Implement your authentication logic here
-  // console.log(element);
-  // const isAuthenticated = firebaseAuth.currentUser !== null ;
-  // console.log(isAuthenticated);
-  // localStorage.setItem('isAuthenticated', isAuthenticated)
   const isAuthenticated = localStorage.getItem('userToken')
-  // const navigate = useNavigate()
-  // if (!storedAuth) {
-  //   <Navigate to={'/'}/>  
-  //   // navigate('/')
-  // }
-  // else if (storedAuth == true) {
-  //   return element;
-  // }
-  // else{
-  //     return element  
-  // }
-
-  // console.log({isAuthenticated})
 
   return isAuthenticated ? (
     element
@@ -48,10 +28,6 @@ const Router = () => {
     { path: '/edit/:id', element: <EditUser /> },
     { path: '/showAllData/:id', element: <ShowAllData /> },
     { path: '/thankyouPage', element: <ThankYouPage /> },
-    // {
-    //   path: '/',
-    //   element: <Navigate to="/login" />,
-    // },
     {
       path: '/dashboard',
       element: (
