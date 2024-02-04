@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { db } from "./firebase";
-import { doc, getDoc, setDoc,updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc,updateDoc,collection } from 'firebase/firestore';
 import { storage  } from "./firebase";
 import { ref, uploadBytes ,getDownloadURL } from "firebase/storage";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { HiPlus } from "react-icons/hi";
+// import {collectionData} from "../Collection.json"
 
 function EditUser() {
   const { id } = useParams();
@@ -15,6 +16,74 @@ function EditUser() {
   const [newProfilePhoto, setNewProfilePhoto] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const statusOptions = ['Open', 'In Progress', 'Completed'];
+
+
+    const handleMigrateCollection = () =>{
+    const yourCollection = collection(db,'Database');
+
+    // Sample data for all documents
+    const allDocumentsData =  [
+      {
+        "balance": "$3,946.45",
+        "image": "http://placehold.it/32x32",
+        "age": 23,
+        "name": "Bird Ramsey",
+        "gender": "male",
+        "company": "NIMON",
+        "email": "birdramsey@nimon.com"
+      },
+      {
+        "balance": "$2,499.49",
+        "picture": "http://placehold.it/32x32",
+        "age": 31,
+        "name": "Lillian Burgess",
+        "gender": "female",
+        "company": "LUXURIA",
+        "email": "lillianburgess@luxuria.com"
+      },
+      {
+        "balance": "$2,820.18",
+        "picture": "http://placehold.it/32x32",
+        "age": 34,
+        "name": "Kristie Cole",
+        "gender": "female",
+        "company": "QUADEEBO",
+        "email": "kristiecole@quadeebo.com"
+      },
+      {
+        "balance": "$3,277.32",
+        "picture": "http://placehold.it/32x32",
+        "age": 30,
+        "name": "Leonor Cross",
+        "gender": "female",
+        "company": "GRONK",
+        "email": "leonorcross@gronk.com"
+      },
+      {
+        "balance": "$1,972.47",
+        "image": "http://placehold.it/32x32",
+        "age": 28,
+        "name": "Marsh Mccall",
+        "gender": "male",
+        "company": "ULTRIMAX",
+        "email": "marshmccall@ultrimax.com"
+      }
+    ]
+
+    // Add all documents to the collection
+    allDocumentsData.forEach((docData, index) => {
+      setDoc(doc(yourCollection, `document_${index + 1}`), docData)
+        .then(() => {
+          console.log(`Document ${index + 1} added successfully`);
+        })
+        .catch((error) => {
+          console.error(`Error adding document ${index + 1}: `, error);
+        });
+    })};
+    
+  useEffect(() => {
+    handleMigrateCollection();
+  }, []);
   
   const handleStatusChange = (e) => {
     e.preventDefault();
@@ -62,15 +131,6 @@ function EditUser() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-
-    // if (!storedToken) {
-    //   // User not logged in
-    //   // You might want to handle this case accordingly
-    //   return;
-    // }
-
-    // Ensure that the data you want to update is in the correct format.
     const updatedData = currentDataFromFirebase;
     console.log(updatedData);
 
@@ -269,6 +329,7 @@ function EditUser() {
             </div>
         </div>
             <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleSubmit}>Update</button>
+            <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleMigrateCollection}>Upload</button>
           </div>
         </div>
        </div>       

@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { db } from "./firebase";
 import { doc, getDoc } from 'firebase/firestore';
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function ShowAllData() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [currentDataFromFirebase, setCurrentDataFromFirebase] = useState({});
+
+  const handleSubmit = () => {
+    navigate('/dashboard')
+  }
 
   useEffect(() => {
     const getDatasFromFirebase = async () => {
@@ -157,6 +162,9 @@ function ShowAllData() {
             <div className="w-1/3">
               <label className="mb-2 font-medium">How Did you find us?: </label>
               <label className="mb-2 text-black ">{currentDataFromFirebase.howFound}</label>
+            </div>
+            <div className="w-1/3">
+            <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleSubmit}>Back to Dashboard</button>
             </div>
         </div>
           </div>

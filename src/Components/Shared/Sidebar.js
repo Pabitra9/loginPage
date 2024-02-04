@@ -1,10 +1,10 @@
 import React from 'react';
 import { HiOutlineLogout, HiViewGrid, HiX } from 'react-icons/hi';
-import { Link, useLocation, useNavigate  } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { firebaseAuth } from '../../RegistrationForm/firebase';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { signOut } from 'firebase/auth';
-import { getDocs, collection } from 'firebase/firestore';
+import { getDoc, collection,doc } from 'firebase/firestore';
 import { db } from '../../RegistrationForm/firebase';
 import profilePic from '../../Profile.png'
 
@@ -12,34 +12,16 @@ import profilePic from '../../Profile.png'
 const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [userCredentialFromFirebase,setUserCredentialFromFirebase] = ('')
 
-  const getDatasFromFirebase = async () => {
-    try {
-      const userCredentialCollection = collection(db, 'UserCredential');
-      const querySnapshot = await getDocs(userCredentialCollection);
-  
-      const userCredentialData = [];
-      console.log(userCredentialData);
-  
-      querySnapshot.forEach((doc) => {
-        if (doc.exists()) {
-          // Assuming you want to push the data to an array
-          userCredentialData.push(doc.data());
-        }
-      });
-  
-       setUserCredentialFromFirebase(userCredentialData);
-    } catch (error) {
-      console.error('Error getting documents: ', error);
-    }
+  const extractUserName = (email) => {
+    // Assuming email is in the format 'username@example.com'
+    const usernameWithoutDots = email.split('@')[0].replace(/\./g, ' ');
+    // Capitalize the first letter of each word
+    return usernameWithoutDots.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
   };
-  
-  // Call the function in your useEffect
-  useEffect(() => {
-    getDatasFromFirebase();
-    console.log(userCredentialFromFirebase);
-  }, []);
+
+  const userDisplayName = extractUserName(firebaseAuth.currentUser.email);
+
 
   const handleLogOut = async () => {
     try {
@@ -47,33 +29,22 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
       localStorage.clear();
       // Sign the user out using Firebase auth
       // Additional cleanup or state changes can be done here if needed
+      
+      localStorage.removeItem('userToken');
+        
       navigate('/', { replace: true }); // Redirect to the login page and replace history
     } catch (error) {
       console.error('Error logging out:', error);
     }
   };
 
-  // useEffect(() => {
-  //   const unblock = history.block((location, action) => {
-  //     if (action === 'POP' && location.pathname === '/logout') {
-  //       console.log("You can't go back to Logout!");
-  //       return false;
-  //     }
-  //     return true;
-  //   });
-
-  //   return () => {
-  //     unblock();
-  //   };
-  // }, [history]);
-
   return (
     <div className="flex flex-col w-64 p-3 text-white relative">
       <HiX className='text-2xl absolute left-56 top-14 hidden mobile:flex overflow-hidden' onClick={() => setSidebarOpen(!isSidebarOpen)}/>
         <div className='flex items-center justify-start my-8 pb-2 gap-4 border-b'>
             <img src={profilePic} className='w-10 cursor-pointer'/>
-            <span className='text-xl font-semibold '>Pabitra Kumar</span>
-            {console.log(userCredentialFromFirebase)}
+            <span className='text-xl font-semibold text-white'>{userDisplayName}</span>
+            {/* {console.log(userCredentialFromFirebase)} */}
             </div>
       {/* <h1 className=" text-2xl font-semibold m-5 pb-4 ">Sidebar</h1> */}
       <div className="flex-1 ">
