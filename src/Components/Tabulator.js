@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { HiOutlineArchive, HiPencilAlt, HiOutlineInformationCircle } from 'react-icons/hi';
 import { useLocation } from 'react-router-dom';
 import { db } from '../RegistrationForm/firebase';
-import { getDocs, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
-import ShowAllData from '../RegistrationForm/ShowAllData';
+import { CiExport } from "react-icons/ci";
+
+import Papa from 'papaparse';
 
 
 const Tabulator = () => {
@@ -13,11 +15,6 @@ const Tabulator = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [jumpToPage, setJumpToPage] = useState('');
-  // const statusOptions = ['Open', 'In Progress', 'Completed'];
-
-  // const navigate = useNavigate()
-  
-  // const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
 
   
   const location = useLocation();
@@ -25,27 +22,6 @@ const Tabulator = () => {
   // console.log(location.state);
   const displayData = searchResults || data;
 
-  // const handleStatusChange = async (e, itemId) => {
-  //   e.preventDefault();
-  //   console.log("itemId :" ,itemId);
-    
-  //   const newStatus = e.target.value;
-  
-  //   console.log("New Status:", newStatus);
-  
-  //   // Update the status in the local state using the functional form of setData
-  //   setData(prevData => {
-  //     console.log("Previous Data:", prevData);
-      
-  //     return prevData.map(item =>
-  //       item.id === itemId ? { ...item, status: newStatus } : item
-  //       );
-  //     });
-      
-  //     // Update the status in the Firestore database
-  //     const itemDocRef = doc(db, 'Database', itemId);
-  //     await updateDoc(itemDocRef, { status: newStatus });
-  // };
   const handleJumpToPage = () => {
     const pageNumber = parseInt(jumpToPage, 10);
     if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalPages) {
@@ -73,6 +49,7 @@ const Tabulator = () => {
             // setCurrentUserRole(newRole);
             // Save the user role to localStorage
             localStorage.setItem('currentUserRole', e.role);
+            localStorage.setItem('currentUserEmail',e.email)
           }
         });
       } catch (error) {
@@ -107,6 +84,44 @@ const Tabulator = () => {
   }, []);
   // console.log(data);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'Database'));
+  
+        const allData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+  
+        setData(allData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+  
+    fetchData();
+  }, []);
+        // console.log(data);
+        // const handleExportData = () => {
+        //   console.log('hauchi');
+        //   exportToExcel(data, 'exportedData');
+        // };
+
+
+        const exportToCSV = () => {
+          const csv = Papa.unparse(data);
+      
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const link = document.createElement('a');
+          const url = URL.createObjectURL(blob);
+          link.href = url;
+          link.setAttribute('download', 'firebase_data.csv');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        };
+
   const handleDeleteClick = async (id) => {
     const deleteValue = doc(db, 'Database', id);
     await deleteDoc(deleteValue);
@@ -126,11 +141,15 @@ const Tabulator = () => {
   const currentPageData = displayData.slice(startIndex, endIndex);
   // console.log(currentPageData);
 
+  
+
   return (
     <div className="min-h-screen mx-auto p-4">
+    <div className='flex justify-between'>
       <h1 className="text-2xl font-bold mb-4">Data Table</h1>
+      {data.length>0 &&(<button type="submit" className="bg-[#2960a1] flex items-center gap-1 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={exportToCSV}><CiExport className="text-white text-lg"/>Export to Excel</button>)}
+      </div>  
         <h1 className="text-2xl font-bold mb-4">{currentUserRole}</h1>
-        
       <table className="min-w-full bg-white rounded-lg shadow-lg">
         <thead>
           <tr>

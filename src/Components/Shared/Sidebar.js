@@ -2,12 +2,8 @@ import React from 'react';
 import { HiOutlineLogout, HiViewGrid, HiX } from 'react-icons/hi';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { firebaseAuth } from '../../RegistrationForm/firebase';
-import { useEffect, useState } from 'react';
 import { signOut } from 'firebase/auth';
-import { getDoc, collection,doc } from 'firebase/firestore';
-import { db } from '../../RegistrationForm/firebase';
 import profilePic from '../../Profile.png'
-
 
 const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
   const location = useLocation();
@@ -20,9 +16,8 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
     return usernameWithoutDots.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
   };
 
-  const userDisplayName = extractUserName(firebaseAuth.currentUser.email);
-
-
+  const userDisplayName = extractUserName(localStorage.getItem('currentUserEmail'));
+  
   const handleLogOut = async () => {
     try {
       await signOut(firebaseAuth); 
@@ -31,11 +26,14 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
       // Additional cleanup or state changes can be done here if needed
       
       localStorage.removeItem('userToken');
-        
-      navigate('/', { replace: true }); // Redirect to the login page and replace history
+      localStorage.removeItem('currentUserRole')
+      localStorage.removeItem('currentUserEmail')
+      
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Error logging out:', error);
     }
+
   };
 
   return (

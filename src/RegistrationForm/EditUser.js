@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
 import { db } from "./firebase";
-import { doc, getDoc, setDoc,updateDoc,collection } from 'firebase/firestore';
-import { storage  } from "./firebase";
-import { ref, uploadBytes ,getDownloadURL } from "firebase/storage";
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs , addDoc } from 'firebase/firestore';
+import { storage } from "./firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { HiPlus } from "react-icons/hi";
+import { CiImport } from "react-icons/ci";
+import { readExcelFile } from '../Components/ReadExcelFileToImport';
+import { useEffect, useState } from "react";
+
 // import {collectionData} from "../Collection.json"
 
 function EditUser() {
@@ -13,8 +16,10 @@ function EditUser() {
   const navigate = useNavigate();
 
   const [currentDataFromFirebase, setCurrentDataFromFirebase] = useState({});
+  const [data, setData] = useState([])
   const [newProfilePhoto, setNewProfilePhoto] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [excelFile , setExcelFile] = useState ("")
   const statusOptions = ['Open', 'In Progress', 'Completed'];
 
 
@@ -74,7 +79,7 @@ function EditUser() {
     allDocumentsData.forEach((docData, index) => {
       setDoc(doc(yourCollection, `document_${index + 1}`), docData)
         .then(() => {
-          console.log(`Document ${index + 1} added successfully`);
+          // console.log(`Document ${index + 1} added successfully`);
         })
         .catch((error) => {
           console.error(`Error adding document ${index + 1}: `, error);
@@ -125,8 +130,6 @@ function EditUser() {
 
   };
 
-  
-  
   newProfilePhoto && console.log(newProfilePhoto);
 
   const handleSubmit = async (e) => {
@@ -184,6 +187,53 @@ function EditUser() {
     }
   };
   console.log(id);
+      const handleInputFileChange = (e) => {
+        e.preventDefault()
+        setExcelFile (e.target.files[0])
+      };
+
+      const handleImportData = async () => {
+        try {
+          if (!excelFile) {
+            console.error('No Excel file selected');
+            return;
+          }
+      
+          // Read the Excel file
+          const excelData = await readExcelFile(excelFile);
+      
+          // Assuming the first row in excelData contains field names
+          const fieldNames = excelData[0];
+      
+          // Assuming each array in excelData represents a row of data
+          const yourCollection = collection(db, 'Database');
+      
+          for (let index = 1; index < excelData.length; index++) {
+            try {
+              const data = excelData[index];
+      
+              // Convert the array to an object using field names from the first row
+              const objectData = {};
+              fieldNames.forEach((fieldName, i) => {
+                // Add the field to the object regardless of whether it's defined
+                objectData[fieldName] = data[i];
+              });
+      
+              // Add each document to the collection
+              await addDoc(yourCollection, objectData);
+            } catch (error) {
+              console.error(`Error adding document ${index}: `, error);
+            }
+          }
+      
+          alert('Data imported successfully');
+        } catch (error) {
+          console.error('Error reading Excel file:', error);
+          alert('Error importing data');
+        }
+      };
+      
+
 
   return (
     <div className="h-screen w-screen flex items-center rounded-md shadow-md">
@@ -234,10 +284,28 @@ function EditUser() {
             </div>
       <div className="w-full h-full overflow-y-scroll bg-gray-100 rounded-e-md shadow-md">
       <div className="flex flex-wrap gap-4 m-10 mb-0">
-              <div className="w-full">
-              {/* <label className="mb-2">Name</label> */}
-              <input type="text" name="name" className="w-full mb-2 border-b-2 text-5xl font-semibold bg-transparent outline-none capitalize" placeholder="Name" value={currentDataFromFirebase.name} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value.toLocaleLowerCase() })}/>
-              </div>
+      <div className="w-full flex h-auto items-center justify-between">
+      <input
+      type="text"
+      name="name"
+      className="w-auto mb-2 border-b-2 text-5xl font-semibold bg-transparent outline-none capitalize"
+      placeholder="Name"
+      value={currentDataFromFirebase.name}
+      onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value.toLocaleLowerCase() })}
+      />
+
+    <select
+    value={currentDataFromFirebase.status}
+    onChange={(e) => handleStatusChange(e, id)}
+    className={`px-2 py-1 border-solid border-gray-400 border-2 w-auto h-10 rounded ${currentDataFromFirebase?.status === 'Open' ? 'bg-[#FF474C] border-2 border-red-800 font-medium' : currentDataFromFirebase?.status === 'In Progress' ? 'bg-[#90EE90] font-medium border-2 border-green-800' : currentDataFromFirebase?.status === 'Completed' ? 'bg-[#ADD8E6] font-medium border-2 border-blue-800' : null }`}
+     >
+    {statusOptions.map((option) => (
+      <option key={option} value={option} className="bg-white">
+        {option}
+      </option>
+    ))}
+    </select>
+    </div>
               {/* <label className="mb-2">Date of Birth</label> */}
               <div className="w-1/3">
               <input type="text" name="dob" className="w-full mb-2 border-b-2 outline-none bg-transparent" placeholder="Date of Birth" value={currentDataFromFirebase.dob} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, dob: e.target.value })}/>
@@ -248,19 +316,21 @@ function EditUser() {
             </div>
             <div className="w-1/3">
               {/* <input type="text" name="gender" className="w-full mb-2 border-b-2 outline-none bg-transparent" placeholder="Gender" value={currentDataFromFirebase.gender} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, gender: e.target.value })}/> */}
-              <label className="mr-2 font-medium">Status</label>
-              <select
-              value={currentDataFromFirebase.status}
-              onChange={(e) => handleStatusChange(e,id)} // or handleStatusChange(e, result.id) for searchResults
-              className="px-2 py-1 border rounded"
-              >
-              {statusOptions.map((option) => (
-              <option key={option} value={option}>
-              {option}
-              </option>
-              ))}
-              </select> 
             </div>
+            {/* <div className="w-1/4">
+              <div className="w-32 first-letter flex items-center border-solid border-red-400 border-2 p-1 rounded-md gap-1">
+              <CiImport className="text-red-700 text-lg " onClick={handleImportData} />
+              <input type="file" accept=".xlsx, .xls" onChange={handleInputFileChange} className=""/>
+              </div>
+            </div> */}
+            {/* <div className="w-1/5">
+              <div className="w-32 first-letter flex items-center border-solid border-green-400 border-2 p-1 rounded-md gap-1">
+              <CiExport className="text-green-700 text-lg"/>
+              {data.length > 0 && (
+              <button onClick={handleExportData} className="font-semibold">Export Data</button>
+              )}
+              </div>
+            </div> */}
           </div>
           <div>
             <div className="p-4 rounded-lg shadow-lg ">

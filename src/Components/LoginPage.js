@@ -36,7 +36,7 @@ function LoginPage() {
     //     localStorage.removeItem('userToken');
     //   }
     // };
-  }, [isAuthenticated]);
+  }, []);
   
 
     const userDispatch = useDispatch()
