@@ -28,15 +28,15 @@ const Tabulator = () => {
   console.log(searchResults);
   const displayData = searchResults || data;
 
-  const handleJumpToPage = () => {
-    const pageNumber = parseInt(jumpToPage, 10);
-    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalNoOfPageCount) {
-      setCurrentPage(pageNumber);
-      console.log(currentPage);
-      setJumpToPage('');
-      setLastVisible(''); 
-    }
-  };
+  // const handleJumpToPage = () => {
+  //   const pageNumber = parseInt(jumpToPage, 10);
+  //   if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalNoOfPageCount) {
+  //     setCurrentPage(pageNumber);
+  //     console.log(currentPage);
+  //     setJumpToPage('');
+  //     setLastVisible(''); 
+  //   }
+  // };
 
   const [currentUserRole, setCurrentUserRole] = useState(()=>{
     const storedRole = localStorage.getItem('currentUserRole');
@@ -97,6 +97,7 @@ const Tabulator = () => {
     const fetchData = async () => {
       try {
         console.log(lastVisible);
+        setData((prevData) => [...prevData, { loading: true }]);
         const totalCountSnapshot = await getCountFromServer(collection(db, 'Database'));
         const totalCount = totalCountSnapshot.data().count;
         console.log(totalCount);
@@ -191,6 +192,7 @@ const Tabulator = () => {
           ...doc.data(),
         }));
         // console.log(fetchData);
+        setData((prevData) => prevData.slice(0, -1));
         
         // Combine the current data with the new data
         setData((prevData) => (lastVisible ? [...prevData, ...fetchedData] : fetchedData));
@@ -212,7 +214,7 @@ const Tabulator = () => {
 
   // Get the data to display on the current page
   //const currentPageData = displayData.slice(startIndex, endIndex);
-  const currentPageData = displayData.slice(startIndex, endIndex);
+  const currentPageData =  displayData.slice(startIndex, endIndex);
   // console.log(currentPageData);
 
   useEffect(() => {
@@ -413,7 +415,7 @@ const Tabulator = () => {
             Next
           </button>
         </div>
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           <span className="mr-2">
             Jump to Page:
           </span>
@@ -422,14 +424,14 @@ const Tabulator = () => {
             value={jumpToPage}
             onChange={(e) => setJumpToPage(e.target.value)}
             className="px-2 py-1 border rounded"
-          />
-          <button
+          /> */}
+          {/* <button
             onClick={handleJumpToPage}
             className="ml-2 py-2 px-4 bg-gray-300 text-gray-700 rounded cursor-pointer"
           >
             Go
-          </button>
-        </div>
+          </button> */}
+        {/* </div> */}
       </div>
     </div>
   );

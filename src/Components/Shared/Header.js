@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { HiOutlineMenu, HiOutlineSearch } from 'react-icons/hi';
-import { collection, query, where, getDocs , limit,startAfter } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  startAt,
+  endAt,
+  limit,
+  startAfter
+} from 'firebase/firestore';
 import chrmpLogo from '../../CHRMP Logo - Tagline.svg';
 import { db } from '../../RegistrationForm/firebase';
 import { useNavigate } from 'react-router-dom';
@@ -12,118 +23,71 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [displayedData, setDisplayedData] = useState([]);
-  // const [typingTimeout, setTypingTimeout] = useState(null);
   const [lastVisibleDoc, setLastVisibleDoc] = useState(null);
   const navigate = useNavigate();
 
-  // const handleSearch = async () => {
-  //   const trimmedSearchValue = searchValue.trim().toLowerCase();
-  //   console.log(trimmedSearchValue);
-  //   if (trimmedSearchValue !== '') {
-  //     const collectionRef = collection(db, 'Database');
-  //     const q = query(
-  //       collectionRef,
-  //       where('name', '>=', trimmedSearchValue),
-  //       where('name', '<=', trimmedSearchValue + '\uf8ff')
-  //     );
-  //     // const docRefs = await getDocs(q);
-  //     // const results = docRefs.docs.map((doc) => ({
-  //     //   id: doc.id,
-  //     //   ...doc.data(),
-  //     // }));
-  //     // setSearchResults(results);
-  //     navigate('/dashboard', { state: { searchResults: results  } });
-  //    }
-  //   else{
-  //     setSearchResults([])
-  //   }
-  // };
+  useEffect(() => {
+    const fetchData = async () => {
+      if (searchQuery !== '') {
+        try {
+          const q = query(
+            collection(db, 'Database'),
+            orderBy('email'),
+            startAt(searchQuery),
+            endAt(searchQuery + '\uf8ff'),
+            limit(10)
+          );
 
-  // const handleInputChange = (event) => {
-  //   event.preventDefault();
-  //   setSearchValue(event.target.value);
+          onSnapshot(q, (snapshot) => {
+            const newData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+            setDisplayedData(newData);
 
-  //   // Clear existing timeout
-  //   if (typingTimeout) {
-  //     clearTimeout(typingTimeout);
-  //   }
+            const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+            setLastVisibleDoc(lastDoc);
+          });
+        } catch (error) {
+          console.error('Error searching for similar keywords:', error);
+          setDisplayedData([]);
+        }
+      } else {
+        setDisplayedData([]); // Clear displayedData when searchQuery is empty
+      }
+    };
 
-  //   // Set a new timeout
-  //   setTypingTimeout(
-  //     setTimeout(() => {
-  //       handleSearch();
-  //     }, 1000),
-  //   );
-  // };
-
-  useEffect(()=>{
     fetchData();
-    console.log('search hauchi');
-  },[searchQuery])
-  
-  console.log(searchQuery);
-  const fetchData = async () => {
-    let Squery =query( collection(db,'Database'));
-
-    if (searchQuery != '') {
-      Squery = query(Squery, where('email', '==', searchQuery));
-    }
-    Squery = query(Squery, limit(10));
-    try {
-      const snapshot = await getDocs(Squery);
-
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setDisplayedData(data);
-
-      const lastDoc = snapshot.docs[snapshot.docs.length - 1];
-      setLastVisibleDoc(lastDoc);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setDisplayedData([]); // Reset displayed data in case of an error
-    }
-  };
+  }, [searchQuery]);
 
   const loadMoreData = async () => {
     if (lastVisibleDoc) {
-      const Squery = query(collection(db,'Database')
-                    ,where('email', '==', searchQuery)
-                    ,startAfter(lastVisibleDoc)
-                    ,limit(10));
+      try {
+        const q = query(
+          collection(db, 'Database'),
+          orderBy('email'),
+          startAt(searchQuery),
+          endAt(searchQuery + '\uf8ff'),
+          startAfter(lastVisibleDoc),
+          limit(10)
+        );
 
-                    try {
-                      const snapshot = await getDocs(Squery);
-              
-                      const newData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-                      setDisplayedData((prevData) => [...prevData, ...newData]);
-              
-                      const lastDoc = snapshot.docs[snapshot.docs.length - 1];
-                      setLastVisibleDoc(lastDoc);
-                      navigate('/dashboard', { state: { searchResults: displayedData } });
-                      console.log('hauchi');
-                    } catch (error) {
-                      console.error('Error fetching more data:', error);
-                    }
+        const snapshot = await getDocs(q);
+        const newData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+        setDisplayedData((prevData) => [...prevData, ...newData]);
+        navigate('/dashboard', { state: { searchResults: displayedData } });
+        const newLastDoc = snapshot.docs[snapshot.docs.length - 1];
+        setLastVisibleDoc(newLastDoc);
+      } catch (error) {
+        console.error('Error fetching more data:', error);
+      }
     }
   };
-  
-  const handleSearch = async (newSearchQuery) => {
+
+  const handleSearch = (newSearchQuery) => {
     setSearchQuery(newSearchQuery.trim());
     setLastVisibleDoc(null); // Reset lastVisibleDoc when the search query changes
     if (newSearchQuery.trim() === '') {
       console.log('please enter a value');
       navigate('/dashboard');
-    } else {
-      try {
-        const resultQuery = query(collection(db, 'Database'), where('email', '==', newSearchQuery));
-        const resultSnapshot = await getDocs(resultQuery);
-
-        if (resultSnapshot.empty) {
-          // No results found
-          setDisplayedData([]);
-        }
-      } catch (error) {
-        console.error('Error checking for search results:', error);
-      }
     }
   };
 
@@ -140,14 +104,19 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
           <input
             type="text"
             className="bg-[#DEE5ED] outline-none rounded-3xl pl-4 p-1 font-normal"
-            // value={searchValue}
-            // onChange={handleInputChange}
             value={searchQuery}
-           onChange= {(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearch(e.target.value)}
           />
-          <HiOutlineSearch className="text-[#475569] text-sm"  onClick={loadMoreData}/>
+          <HiOutlineSearch className="text-[#475569] text-sm" onClick={loadMoreData} />
         </div>
       </div>
+
+      {/* Display relevant data based on the search query
+      <ul>
+        {displayedData.map((item) => (
+          <li key={item.id}>{item.email}</li>
+        ))}
+      </ul> */}
     </div>
   );
 };
