@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { doc, getDoc, setDoc, updateDoc, collection, getDocs , addDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection } from 'firebase/firestore';
 import { storage } from "./firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useParams } from "react-router-dom";
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { HiPlus } from "react-icons/hi";
 import { CiImport } from "react-icons/ci";
 import { readExcelFile } from '../Components/ReadExcelFileToImport';
+import CollectionData from '.././Collection.json'
 import { useEffect, useState } from "react";
 
 // import {collectionData} from "../Collection.json"
@@ -19,76 +20,51 @@ function EditUser() {
   const [data, setData] = useState([])
   const [newProfilePhoto, setNewProfilePhoto] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [newIdProofFile, setNewIdProofFile] = useState(null);
+
   const [excelFile , setExcelFile] = useState ("")
-  const statusOptions = ['Open', 'In Progress', 'Completed'];
+  const statusOptions = ['Initial fill up', 'In Progress', 'Completed'];
+
+  function generateRandomId() {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const idLength = 20; // You can adjust the length of the ID as needed
+    let randomId = '';
+  
+    for (let i = 0; i < idLength; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      randomId += characters.charAt(randomIndex);
+    }
+  
+    return randomId;
+  }
 
 
     const handleMigrateCollection = () =>{
     const yourCollection = collection(db,'Database');
 
     // Sample data for all documents
-    const allDocumentsData =  [
-      {
-        "balance": "$3,946.45",
-        "image": "http://placehold.it/32x32",
-        "age": 23,
-        "name": "Bird Ramsey",
-        "gender": "male",
-        "company": "NIMON",
-        "email": "birdramsey@nimon.com"
-      },
-      {
-        "balance": "$2,499.49",
-        "picture": "http://placehold.it/32x32",
-        "age": 31,
-        "name": "Lillian Burgess",
-        "gender": "female",
-        "company": "LUXURIA",
-        "email": "lillianburgess@luxuria.com"
-      },
-      {
-        "balance": "$2,820.18",
-        "picture": "http://placehold.it/32x32",
-        "age": 34,
-        "name": "Kristie Cole",
-        "gender": "female",
-        "company": "QUADEEBO",
-        "email": "kristiecole@quadeebo.com"
-      },
-      {
-        "balance": "$3,277.32",
-        "picture": "http://placehold.it/32x32",
-        "age": 30,
-        "name": "Leonor Cross",
-        "gender": "female",
-        "company": "GRONK",
-        "email": "leonorcross@gronk.com"
-      },
-      {
-        "balance": "$1,972.47",
-        "image": "http://placehold.it/32x32",
-        "age": 28,
-        "name": "Marsh Mccall",
-        "gender": "male",
-        "company": "ULTRIMAX",
-        "email": "marshmccall@ultrimax.com"
-      }
-    ]
+    const allDocumentsData = CollectionData
 
     // Add all documents to the collection
     allDocumentsData.forEach((docData, index) => {
-      setDoc(doc(yourCollection, `document_${index + 1}`), docData)
+      const randomId = generateRandomId();
+      const documentRef = doc(yourCollection, randomId);
+  
+      setDoc(documentRef, docData)
         .then(() => {
-          // console.log(`Document ${index + 1} added successfully`);
+          console.log(`Document ${index + 1} added successfully with ID: ${randomId}`);
         })
         .catch((error) => {
           console.error(`Error adding document ${index + 1}: `, error);
         });
-    })};
+    });
+    console.log('migrate hela');
+    navigate('/dashboard')
+    // handleMigrateCollection();
+  };
     
-  useEffect(() => {
-    handleMigrateCollection();
-  }, []);
+  // useEffect(() => {
+  // }, []);
   
   const handleStatusChange = (e) => {
     e.preventDefault();
@@ -99,6 +75,41 @@ function EditUser() {
     setCurrentDataFromFirebase(updatedData);
   };
 
+  const handleIdProofFileChange = (e) => {
+    e.preventDefault();
+    setNewIdProofFile(e.target.files[0]);
+    // setPreviewImage(URL.createObjectURL(e.target.files[0]));
+  };
+
+
+  const updateIdProof = async (e) => {
+    e.preventDefault();
+    try {
+      if (newIdProofFile) {
+        const newIdProofStorageRef = ref(storage, `idCopy/${newIdProofFile.name}`);
+        await uploadBytes(newIdProofStorageRef, newIdProofFile);
+        const newIdProofUrl = await getDownloadURL(newIdProofStorageRef);
+        console.log(newIdProofUrl);
+        // Update the Firestore document with the new ID proof URL
+        const updatedData = {
+          ...currentDataFromFirebase,
+          idProof: newIdProofUrl,
+        };
+        console.log(updatedData);
+        await updateDoc(doc(db, "Database", id), updatedData);
+        setCurrentDataFromFirebase(updatedData);
+        console.log(updatedData);
+        // alert("Successfully Updated");
+        // navigate("/dashboard");  
+      } else {
+        alert("You dont choose anything Update")  
+      }
+    } catch (error) {
+      console.error("Error updating ID proof:", error);
+      alert("Error updating ID proof");
+    }
+  };
+  
 
   useEffect(() => {
     const getDatasFromFirebase = async () => {
@@ -141,9 +152,12 @@ function EditUser() {
       // Update the document in the Firestore database.
       const updateDocResponse = await updateDoc(doc(db, "Database", id), updatedData);
       console.log(updateDocResponse);
-
-      if (newProfilePhoto) {
+      // console.log(newIdProofFile);
+      if (newProfilePhoto ) {
         await updateProfilePhoto();
+      }
+      if (newIdProofFile) {
+        await updateIdProof();
       }
 
       if (currentDataFromFirebase.status !== currentDataFromFirebase.statusInFirestore) {
@@ -186,54 +200,11 @@ function EditUser() {
       console.error("Error updating profile photo:", error);
     }
   };
-  console.log(id);
+  // console.log(id);
       const handleInputFileChange = (e) => {
         e.preventDefault()
         setExcelFile (e.target.files[0])
       };
-
-      const handleImportData = async () => {
-        try {
-          if (!excelFile) {
-            console.error('No Excel file selected');
-            return;
-          }
-      
-          // Read the Excel file
-          const excelData = await readExcelFile(excelFile);
-      
-          // Assuming the first row in excelData contains field names
-          const fieldNames = excelData[0];
-      
-          // Assuming each array in excelData represents a row of data
-          const yourCollection = collection(db, 'Database');
-      
-          for (let index = 1; index < excelData.length; index++) {
-            try {
-              const data = excelData[index];
-      
-              // Convert the array to an object using field names from the first row
-              const objectData = {};
-              fieldNames.forEach((fieldName, i) => {
-                // Add the field to the object regardless of whether it's defined
-                objectData[fieldName] = data[i];
-              });
-      
-              // Add each document to the collection
-              await addDoc(yourCollection, objectData);
-            } catch (error) {
-              console.error(`Error adding document ${index}: `, error);
-            }
-          }
-      
-          alert('Data imported successfully');
-        } catch (error) {
-          console.error('Error reading Excel file:', error);
-          alert('Error importing data');
-        }
-      };
-      
-
 
   return (
     <div className="h-screen w-screen flex items-center rounded-md shadow-md">
@@ -277,8 +248,39 @@ function EditUser() {
                    <div className="flex justify-center items-center">
                         <div className="w-72 h-20 border-2 border-solid border-white rounded-md">
                             {/* <HiDocument className="w-32 h-20"/> */}
+                            {/* <input
+                              type="file"
+                              accept=".pdf"
+                              onChange={handleIdProofFileChange}
+                            /> */}
+
+                            {/* Display the existing ID proof */}
+                            <img src={currentDataFromFirebase?.idProof} alt="ID Proof" style={{ maxWidth: '100%' }} />
+
+                  {/* Input field for selecting a new ID proof file */}
+                  <input
+                  type="file"
+                  accept=".jpg,.png,image/*"
+                  onChange={handleIdProofFileChange}
+                  className=""
+                  />
+
+                  {/* Display the preview of the new ID proof file */}
+                {previewImage && (
+                <img src={currentDataFromFirebase.idProof} alt="New ID Proof Preview" className="w-48 h-48 rounded-full border-solid border-[#8DC162] border-4 object-cover" />
+                )}
+
+                {/* Button to update the ID proof */}
+              {/* <button
+              type="submit"
+              className=" bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium"
+              onClick={updateIdProof}
+              >
+              Update ID Proof
+              </button> */}
                         </div>
-                   {/* <object data={currentDataFromFirebase.idProof} type="application/pdf" width="100" height="200"></object> */}
+                    {/* <p>{currentDataFromFirebase.idProof}</p> */}
+                    {/* {console.log({currentDataFromFirebase.idProof})}; */}
 
                    </div>
             </div>
@@ -297,7 +299,7 @@ function EditUser() {
     <select
     value={currentDataFromFirebase.status}
     onChange={(e) => handleStatusChange(e, id)}
-    className={`px-2 py-1 border-solid border-gray-400 border-2 w-auto h-10 rounded ${currentDataFromFirebase?.status === 'Open' ? 'bg-[#FF474C] border-2 border-red-800 font-medium' : currentDataFromFirebase?.status === 'In Progress' ? 'bg-[#90EE90] font-medium border-2 border-green-800' : currentDataFromFirebase?.status === 'Completed' ? 'bg-[#ADD8E6] font-medium border-2 border-blue-800' : null }`}
+    className={`px-2 py-1 outline-none w-auto h-10 rounded ${currentDataFromFirebase?.status === 'Initial fill up' ? 'bg-[#FF8589] border-2 border-red-800 font-medium text-red-800' : currentDataFromFirebase?.status === 'In Progress' ? 'bg-[#90EE90] font-medium border-2 border-green-800 text-green-800' : currentDataFromFirebase?.status === 'Completed' ? 'bg-[#ADD8E6] font-medium border-2 border-blue-800 text-blue-800' : null }`}
      >
     {statusOptions.map((option) => (
       <option key={option} value={option} className="bg-white">

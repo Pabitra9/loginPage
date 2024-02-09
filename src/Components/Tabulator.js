@@ -3,30 +3,38 @@ import { Link } from 'react-router-dom';
 import { HiOutlineArchive, HiPencilAlt, HiOutlineInformationCircle } from 'react-icons/hi';
 import { useLocation } from 'react-router-dom';
 import { db } from '../RegistrationForm/firebase';
-import { getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
+import { getDocs, collection, deleteDoc, doc ,query,limit,orderBy,startAfter, getCountFromServer} from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 import { CiExport } from "react-icons/ci";
-
 import Papa from 'papaparse';
 
-
+// const ITEMS_PER_PAGE = 10;
 const Tabulator = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [jumpToPage, setJumpToPage] = useState('');
+  const [totalNoOfPageCount, setTotalNoOfPagecount] = useState(1)
+  const [totalNoOfData, setTotalNoOfData] = useState(1)
+  const [lastVisible , setLastVisible] = useState('');
+  const [exportedData, setExportedData] = useState([])
+  // const [totalDataFetchAccordingToPage , setTotalDataFetchAccordingToPage] = useState(0)
+  // const [displayData, setDisplayData] = useState(searchResults || data);
 
   
   const location = useLocation();
   const { searchResults } = location.state || {};
-  // console.log(location.state);
+  console.log(location.state);
+  console.log(searchResults);
   const displayData = searchResults || data;
 
   const handleJumpToPage = () => {
     const pageNumber = parseInt(jumpToPage, 10);
-    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalPages) {
+    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalNoOfPageCount) {
       setCurrentPage(pageNumber);
+      console.log(currentPage);
       setJumpToPage('');
+      setLastVisible(''); 
     }
   };
 
@@ -45,9 +53,8 @@ const Tabulator = () => {
         const filteredUserRole = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
         filteredUserRole.forEach((e) => {
           if (e.email === user[0].email) {
+            console.log(user[0].email);
             setCurrentUserRole(e.role);
-            // setCurrentUserRole(newRole);
-            // Save the user role to localStorage
             localStorage.setItem('currentUserRole', e.role);
             localStorage.setItem('currentUserEmail',e.email)
           }
@@ -61,93 +68,215 @@ const Tabulator = () => {
     getUserRoleList();
   }, [user, userCollectionRef]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const querySnapshot = await getDocs(collection(db, 'Database'));
-      const userData = [];
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const querySnapshot = await getDocs(collection(db, 'Database'));
+  //     const userData = [];
 
-      querySnapshot.forEach((doc) => {
-        const itemData = doc.data();
-        userData.push({
-          id: doc.id,
-          name: itemData.name,
-          email: itemData.email,
-          course: itemData.certificationProgram,
-          status: itemData.status,
-        });
-      });
-
-      setData(userData);
-    };
-
-    fetchData();
-  }, []);
-  // console.log(data);
-
-  useEffect(() => {
+  //     querySnapshot.forEach((doc) => {
+  //       const itemData = doc.data();
+  //       userData.push({
+    //         id: doc.id,
+    //         name: itemData.name,
+    //         email: itemData.email,
+    //         course: itemData.certificationProgram,
+    //         status: itemData.status,
+    //       });
+    //     });
+    
+    //     setData(userData);
+    //   };
+    
+    //   fetchData();
+    // }, []);
+    
+    useEffect(() => {
+      fetchData();
+      console.log('Data Fetch Hela');
+  }, [currentPage, totalNoOfPageCount]); 
     const fetchData = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'Database'));
+        console.log(lastVisible);
+        const totalCountSnapshot = await getCountFromServer(collection(db, 'Database'));
+        const totalCount = totalCountSnapshot.data().count;
+        console.log(totalCount);
+        setTotalNoOfData(totalCount)
+        // Calculate the total pages
+        const totalPages = Math.ceil(totalCount / itemsPerPage);
+        console.log(totalPages);
+        setTotalNoOfPagecount(totalPages)
+        // setTotalDataFetchAccordingToPage(totalPages);
+      //   const firstQuery = query(
+      //     collection(db, 'Database'),
+      //     orderBy('name'),
+      //     startAfter(lastVisible),
+      //     limit(10)
+      //   );
+      //   const documentSnapshots = await getDocs(firstQuery);
+      //     console.log(documentSnapshots);
+      //   //Get the last visible document
+      //   //const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
+      //   console.log(documentSnapshots.docs);
+      //   console.log(lastVisible);
+      //   setLastVisible(documentSnapshots.docs[documentSnapshots.docs.length - 1]);
+
+      //   // Construct a new query starting at this document,
+      //   const nextQuery = query(
+      //     collection(db, 'Database'),
+      //     orderBy('name'),
+      //     startAfter(lastVisible),
+      //     limit(10)
+      //   );
+
+      //   // Fetch the next set of data
+      //   const nextDocumentSnapshots = await getDocs(nextQuery);
+      //   console.log(nextDocumentSnapshots.docs.length);
+      //   if (nextDocumentSnapshots.empty) {
+      //     // No more data to fetch
+      //     console.log("hei gala au nai");
+      //     return;
+      //   }
+
+      //   // Map the next set of data
+      //   const firstData = documentSnapshots.docs.map((doc) => ({
+      //     id: doc.id,
+      //     ...doc.data(),
+      //   }));
+      //   console.log(firstData);
+      //   const nextData = nextDocumentSnapshots.docs.map((doc) => ({
+      //     id: doc.id,
+      //     ...doc.data(),
+      //   }));
+      //   console.log(typeof(nextData));
+      
+      //  // Combine the current data with the new data
+      //   const allData = [
+      //     ...firstData,
+      //     ...nextData
+      // ];
+        // setData(allData);
+        // console.log(allData);
+
+        let queryData;
+        if (lastVisible) {
+          queryData = query(
+            collection(db, 'Database'),
+            orderBy('name'),
+            startAfter(lastVisible),
+            limit(10)
+          );
+        } else {
+          queryData = query(
+            collection(db, 'Database'),
+            orderBy('name'),
+            limit(10)
+          );
+        }
+    
+        const documentSnapshots = await getDocs(queryData);
+    
+        if (documentSnapshots.empty) {
+          // No more data to fetch
+          console.log("No data found");
+          return;
+        }
+    
+        // Get the last visible document
+        const lastVisibleDocument = documentSnapshots.docs[documentSnapshots.docs.length - 1];
+        setLastVisible(lastVisibleDocument);
+    
+        // Map the data
+        const fetchedData = documentSnapshots.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        // console.log(fetchData);
+        
+        // Combine the current data with the new data
+        setData((prevData) => (lastVisible ? [...prevData, ...fetchedData] : fetchedData));
+        
+        console.log(data);
+        // console.log(allData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    console.log(currentPage);
+    // fetchData();
+  
+  //Calculate the index range for the current page
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  console.log(startIndex);
+  const endIndex = startIndex + itemsPerPage;
+  console.log(endIndex);
+
+  // Get the data to display on the current page
+  //const currentPageData = displayData.slice(startIndex, endIndex);
+  const currentPageData = displayData.slice(startIndex, endIndex);
+  // console.log(currentPageData);
+
+  useEffect(() => {
+    if (exportedData.length > 0) {
+      console.log('Data ready for export:', exportedData);
+      exportToCSV();
+    }
+  }, [exportedData]);
+    const fetchDataToExport = async () => {
+      try {
+        const exportData = query(collection(db,'Database'),limit(100))
+        const querySnapshot = await getDocs(exportData);
   
         const allData = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
   
-        setData(allData);
+        setExportedData(allData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-  
-    fetchData();
-  }, []);
-        // console.log(data);
-        // const handleExportData = () => {
-        //   console.log('hauchi');
-        //   exportToExcel(data, 'exportedData');
-        // };
-
-
-        const exportToCSV = () => {
-          const csv = Papa.unparse(data);
       
-          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-          const link = document.createElement('a');
-          const url = URL.createObjectURL(blob);
-          link.href = url;
-          link.setAttribute('download', 'firebase_data.csv');
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        };
+      const exportToCSV = () => {
+        const csv = Papa.unparse(exportedData,{ header: true
+       // columns: ['id', 'status', /* other fields */] // Explicitly specify columns
+       });
+        // console.log(csv);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', 'firebase_data.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
 
   const handleDeleteClick = async (id) => {
-    const deleteValue = doc(db, 'Database', id);
-    await deleteDoc(deleteValue);
-    alert("Do you really want to delete this data ?");
-    window.location.reload();
+      const result = window.confirm('Are you sure you want to proceed?');
+      if (result) {
+        const deleteValue = doc(db, 'Database', id);
+        await deleteDoc(deleteValue);
+        const updatedData = currentPageData.filter(res => res.id != id);
+        setData(updatedData);
+        // const startIndex = (currentPage - 1) * itemsPerPage;
+        // const endIndex = startIndex + itemsPerPage;
+        // const updatedPageData = updatedData.slice(startIndex, endIndex);
+        // setDisplayData(updatedPageData);
+        // setData(updateResult);
+        console.log('User confirmed');
+      } else {
+        console.log('User canceled');
+      }
   };
 
-  // Calculate total pages
-  const totalPages = Math.ceil(displayData.length / itemsPerPage);
-  // console.log(totalPages);
-
-  // Calculate the index range for the current page
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-
-  // Get the data to display on the current page
-  const currentPageData = displayData.slice(startIndex, endIndex);
-  // console.log(currentPageData);
-
-  
 
   return (
     <div className="min-h-screen mx-auto p-4">
     <div className='flex justify-between'>
       <h1 className="text-2xl font-bold mb-4">Data Table</h1>
-      {data.length>0 &&(<button type="submit" className="bg-[#2960a1] flex items-center gap-1 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={exportToCSV}><CiExport className="text-white text-lg"/>Export to Excel</button>)}
+      {data.length>0 &&(<button type="submit" className="bg-[#2960a1] flex items-center gap-1 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={fetchDataToExport}><CiExport className="text-white text-lg"/>Export to Excel</button>)}
       </div>  
         <h1 className="text-2xl font-bold mb-4">{currentUserRole}</h1>
       <table className="min-w-full bg-white rounded-lg shadow-lg">
@@ -210,7 +339,7 @@ const Tabulator = () => {
       <td className="px-4 py-2 text-left">
         {item.email}
       </td>
-      <td className="px-4 py-2 text-left">{item.course}</td>
+      <td className="px-4 py-2 text-left">{item.certificationProgram}</td>
       <td className="px-4 py-2 text-center">
         {item.status}
     </td>
@@ -261,10 +390,10 @@ const Tabulator = () => {
 
       <div>
           <span className="mr-2">
-            Page {currentPage} of {totalPages}
+            Page {currentPage} of {totalNoOfPageCount}
           </span>
           <span className="text-gray-500">
-            ({displayData.length} items in total)
+            ({totalNoOfData} items in total)
           </span>
         </div>
         <div className="flex">
@@ -276,8 +405,9 @@ const Tabulator = () => {
             Prev
           </button>
           <button
-            onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))}
-            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalNoOfPageCount))}
+            disabled={currentPage === totalNoOfPageCount}
+
             className="ml-2 py-2 px-4 bg-gray-300 text-gray-700 rounded cursor-pointer"
           >
             Next

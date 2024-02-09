@@ -4,10 +4,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { firebaseAuth } from '../../RegistrationForm/firebase';
 import { signOut } from 'firebase/auth';
 import profilePic from '../../Profile.png'
+import { useState , useEffect } from 'react';
 
 const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [userDisplayName, setUserDisplayName] = useState('');
 
   const extractUserName = (email) => {
     // Assuming email is in the format 'username@example.com'
@@ -16,7 +18,23 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
     return usernameWithoutDots.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
   };
 
-  const userDisplayName = extractUserName(localStorage.getItem('currentUserEmail'));
+   useEffect(() => {
+    const fetchUserEmail = async () => {
+      try {
+        const userEmail = localStorage.getItem('currentUserEmail');
+        if (userEmail) {
+          const displayName = await extractUserName(userEmail);
+          setUserDisplayName(displayName);
+        } else {
+          console.error('User email not found in localStorage');
+        }
+      } catch (error) {
+        console.error('Error fetching user email:', error);
+      }
+    };
+
+    fetchUserEmail();
+  }, []); // Empty dependency array ensures the effect runs only once on mount
   
   const handleLogOut = async () => {
     try {

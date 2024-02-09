@@ -2,7 +2,7 @@ import React from "react";
 import Country from './Countries'
 import { useState, useEffect } from "react";
 import { db } from "./firebase";
-import {collection,getDocs,addDoc} from 'firebase/firestore'
+import {collection,addDoc} from 'firebase/firestore'
 import { storage } from "./firebase";
 import { ref , uploadBytes, getDownloadURL, } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
@@ -657,15 +657,16 @@ console.log(errors);
 
                             />
                             {/* {<p className="text-[#ff0000]">{errors.image}</p>} */}
-                        
+                            <p className="block text-[#5D6572] font-semibold mb-2 text-sm"> File must be in jpg, png and should be between 20KB - 300kb file size</p>    
                     </div>
     
                     {/* <!-- Your Id Proof Field --> */}
                     <div className="mb-4">
                         <label for="idProof" className="block text-[#5D6572] font-semibold mb-2 text-sm">Your Id Proof <span className="text-[#ff0000]">*</span></label>
-                        <input type="file" id="idProof" name="idProof" accept=".pdf , .docx" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required onChange={(e)=>{ e.preventDefault()
+                        <input type="file" id="idProof" name="idProof" accept="image/*" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required onChange={(e)=>{ e.preventDefault()
                             setIdproof(e.target.files[0])}} />
                           {/* {<p className="text-[#ff0000]">{errors.idProof}</p>}   */}
+                          <p className="block text-[#5D6572] font-semibold mb-2 text-sm"> File must be in jpg, png and should be between 20KB - 300kb file size</p>
                     </div>
     
                     {/* <!-- Certification Number Field --> */}
