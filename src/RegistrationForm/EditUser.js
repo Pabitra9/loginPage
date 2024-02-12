@@ -212,7 +212,7 @@ function EditUser() {
   // console.log(id);
 
   return (
-    <div className="h-screen w-screen flex items-center rounded-md shadow-md">
+    <div className="h-screen w-screen flex items-center rounded-md shadow-md overflow-hidden">
        {/* <h1 className="text-2xl font-bold mb-4">Edit User Data</h1> */}
       <div className="w-1/3 h-full  bg-[#2960A1] rounded-s-md shadow-lg">
         <div className="flex items-center justify-center m-8 ">
@@ -272,7 +272,7 @@ function EditUser() {
 
                   {/* Display the preview of the new ID proof file */}
                 {previewIDImage ? (
-                <img src={previewIDImage} alt="New ID Proof Preview" className="w-48 h-48 rounded-full object-fill overflow-hidden" />
+                <img src={previewIDImage} alt="New ID Proof Preview" className="w-48 h-48 rounded-full object-fill" />
                 ):(<img src={currentDataFromFirebase.idProof} alt="ID Proof" className="w-48 h-48 rounded-full object-cover" />)}
 
                 {/* Button to update the ID proof */}
@@ -291,7 +291,7 @@ function EditUser() {
             </div>
       <div className="w-full h-full overflow-y-scroll bg-gray-100 rounded-e-md shadow-md">
       <div className="flex flex-wrap gap-4 m-10 mb-0">
-      <div className="w-full flex h-auto items-center justify-between">
+      <div className="w-full flex h-auto items-center justify-between"> 
       <input
       type="text"
       name="name"
