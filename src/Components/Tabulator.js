@@ -13,13 +13,14 @@ const Tabulator = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [jumpToPage, setJumpToPage] = useState('');
+  // const [jumpToPage, setJumpToPage] = useState('');
   const [totalNoOfPageCount, setTotalNoOfPagecount] = useState(1)
   const [totalNoOfData, setTotalNoOfData] = useState(1)
   const [lastVisible , setLastVisible] = useState('');
   const [exportedData, setExportedData] = useState([])
-  // const [totalDataFetchAccordingToPage , setTotalDataFetchAccordingToPage] = useState(0)
-  // const [displayData, setDisplayData] = useState(searchResults || data);
+  const [isLoading, setIsLoading] = useState(false);
+
+ 
 
   
   const location = useLocation();
@@ -49,17 +50,17 @@ const Tabulator = () => {
   useEffect(() => {
     const getUserRoleList = async () => {
       try {
+        if (user && user.length > 0 && user[0].email) {
         const data = await getDocs(userCollectionRef);
         const filteredUserRole = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
         filteredUserRole.forEach((e) => {
           if (e.email === user[0].email) {
-            console.log(user[0].email);
+            // console.log(user[0].email);
             setCurrentUserRole(e.role);
             localStorage.setItem('currentUserRole', e.role);
-            localStorage.setItem('currentUserEmail',e.email)
           }
         });
-      } catch (error) {
+      }} catch (error) {
         console.error(error);
         
       }
@@ -67,37 +68,16 @@ const Tabulator = () => {
 
     getUserRoleList();
   }, [user, userCollectionRef]);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const querySnapshot = await getDocs(collection(db, 'Database'));
-  //     const userData = [];
-
-  //     querySnapshot.forEach((doc) => {
-  //       const itemData = doc.data();
-  //       userData.push({
-    //         id: doc.id,
-    //         name: itemData.name,
-    //         email: itemData.email,
-    //         course: itemData.certificationProgram,
-    //         status: itemData.status,
-    //       });
-    //     });
-    
-    //     setData(userData);
-    //   };
-    
-    //   fetchData();
-    // }, []);
-    
+ 
     useEffect(() => {
       fetchData();
       console.log('Data Fetch Hela');
-  }, [currentPage, totalNoOfPageCount]); 
+  }, [currentPage]); 
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         console.log(lastVisible);
-        setData((prevData) => [...prevData, { loading: true }]);
+       
         const totalCountSnapshot = await getCountFromServer(collection(db, 'Database'));
         const totalCount = totalCountSnapshot.data().count;
         console.log(totalCount);
@@ -106,58 +86,6 @@ const Tabulator = () => {
         const totalPages = Math.ceil(totalCount / itemsPerPage);
         console.log(totalPages);
         setTotalNoOfPagecount(totalPages)
-        // setTotalDataFetchAccordingToPage(totalPages);
-      //   const firstQuery = query(
-      //     collection(db, 'Database'),
-      //     orderBy('name'),
-      //     startAfter(lastVisible),
-      //     limit(10)
-      //   );
-      //   const documentSnapshots = await getDocs(firstQuery);
-      //     console.log(documentSnapshots);
-      //   //Get the last visible document
-      //   //const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
-      //   console.log(documentSnapshots.docs);
-      //   console.log(lastVisible);
-      //   setLastVisible(documentSnapshots.docs[documentSnapshots.docs.length - 1]);
-
-      //   // Construct a new query starting at this document,
-      //   const nextQuery = query(
-      //     collection(db, 'Database'),
-      //     orderBy('name'),
-      //     startAfter(lastVisible),
-      //     limit(10)
-      //   );
-
-      //   // Fetch the next set of data
-      //   const nextDocumentSnapshots = await getDocs(nextQuery);
-      //   console.log(nextDocumentSnapshots.docs.length);
-      //   if (nextDocumentSnapshots.empty) {
-      //     // No more data to fetch
-      //     console.log("hei gala au nai");
-      //     return;
-      //   }
-
-      //   // Map the next set of data
-      //   const firstData = documentSnapshots.docs.map((doc) => ({
-      //     id: doc.id,
-      //     ...doc.data(),
-      //   }));
-      //   console.log(firstData);
-      //   const nextData = nextDocumentSnapshots.docs.map((doc) => ({
-      //     id: doc.id,
-      //     ...doc.data(),
-      //   }));
-      //   console.log(typeof(nextData));
-      
-      //  // Combine the current data with the new data
-      //   const allData = [
-      //     ...firstData,
-      //     ...nextData
-      // ];
-        // setData(allData);
-        // console.log(allData);
-
         let queryData;
         if (lastVisible) {
           queryData = query(
@@ -180,27 +108,32 @@ const Tabulator = () => {
           // No more data to fetch
           console.log("No data found");
           return;
-        }
+        } 
     
         // Get the last visible document
         const lastVisibleDocument = documentSnapshots.docs[documentSnapshots.docs.length - 1];
-        setLastVisible(lastVisibleDocument);
-    
+        
         // Map the data
         const fetchedData = documentSnapshots.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         // console.log(fetchData);
-        setData((prevData) => prevData.slice(0, -1));
+        
         
         // Combine the current data with the new data
         setData((prevData) => (lastVisible ? [...prevData, ...fetchedData] : fetchedData));
-        
+        // if (!lastVisible || currentPage > lastFetchedPage) {
+         
+          setLastVisible(lastVisibleDocument);
+        //   setLastFetchedPage(currentPage);
+        // }
+        setIsLoading(false); 
         console.log(data);
         // console.log(allData);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setIsLoading(false); 
       }
     };
     console.log(currentPage);
@@ -215,7 +148,7 @@ const Tabulator = () => {
   // Get the data to display on the current page
   //const currentPageData = displayData.slice(startIndex, endIndex);
   const currentPageData =  displayData.slice(startIndex, endIndex);
-  // console.log(currentPageData);
+   console.log(currentPageData);
 
   useEffect(() => {
     if (exportedData.length > 0) {
@@ -260,13 +193,21 @@ const Tabulator = () => {
       if (result) {
         const deleteValue = doc(db, 'Database', id);
         await deleteDoc(deleteValue);
-        const updatedData = currentPageData.filter(res => res.id != id);
-        setData(updatedData);
-        // const startIndex = (currentPage - 1) * itemsPerPage;
-        // const endIndex = startIndex + itemsPerPage;
-        // const updatedPageData = updatedData.slice(startIndex, endIndex);
-        // setDisplayData(updatedPageData);
-        // setData(updateResult);
+        // const updatedData = currentPageData.filter(res => res.id != id);
+        // setData(updatedData);
+        // Remove the deleted item from search results
+        console.log(searchResults);
+      const updatedSearchResults = searchResults ? searchResults.filter(item => item.id !== id) : null;
+        console.log(updatedSearchResults);
+      // Update the UI based on the presence of search results
+      if (updatedSearchResults && updatedSearchResults.length > 0) {
+      // If there are remaining search results, update the state
+      setData(updatedSearchResults);
+       } else {
+        // If no more search results, fetch and update with the full data
+       fetchData();
+      
+      }
         console.log('User confirmed');
       } else {
         console.log('User canceled');
@@ -334,7 +275,7 @@ const Tabulator = () => {
       </td>
     </tr>
   ))
-) : currentPageData.length > 0 ? (
+) :  currentPageData.length > 0 ? (
   currentPageData.map((item, index) => (
     <tr key={item.id} className={index % 2 === 0 ? 'bg-[#F1F5F9] border-b border-t' : ''}>
       <td className="px-4 py-2 text-left capitalize">{item.name}</td>
@@ -379,7 +320,7 @@ const Tabulator = () => {
 ) : (
   <tr>
     <td colSpan="5" className="px-4 py-2 text-center text-gray-500">
-      No results found.
+    {totalNoOfData > 0 ? 'Loading ...' : 'No results found.'}
     </td>
   </tr>
 )}
@@ -393,6 +334,7 @@ const Tabulator = () => {
       <div>
           <span className="mr-2">
             Page {currentPage} of {totalNoOfPageCount}
+            
           </span>
           <span className="text-gray-500">
             ({totalNoOfData} items in total)
@@ -401,18 +343,24 @@ const Tabulator = () => {
         <div className="flex">
           <button
             onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
-            disabled={currentPage === 1}
-            className="py-2 px-4 bg-gray-300 text-gray-700 rounded cursor-pointer"
+            disabled={currentPage === 1 }
+            className={`ml-2 py-2 px-4 rounded cursor-pointer ${ currentPage === 1 ? 'bg-gray-300 text-gray-700 cursor-not-allowed' : 'bg-gray-800 text-white'}`}
           >
             Prev
           </button>
           <button
             onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalNoOfPageCount))}
-            disabled={currentPage === totalNoOfPageCount}
+            disabled={currentPage === totalNoOfPageCount || isLoading }
 
-            className="ml-2 py-2 px-4 bg-gray-300 text-gray-700 rounded cursor-pointer"
+            className={`ml-2 py-2 px-4 rounded cursor-pointer ${
+              currentPage === totalNoOfPageCount
+                ? 'bg-gray-300 text-gray-700 cursor-not-allowed'
+                : isLoading
+                ? 'bg-gray-500 text-white cursor-not-allowed'
+                : 'bg-gray-800 text-white'
+            }`}
           >
-            Next
+             {isLoading ? 'Loading...' : 'Next'}
           </button>
         </div>
         {/* <div className="flex items-center">

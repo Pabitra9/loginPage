@@ -25,16 +25,17 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
   const [displayedData, setDisplayedData] = useState([]);
   const [lastVisibleDoc, setLastVisibleDoc] = useState(null);
   const navigate = useNavigate();
-
+  
+  const formattedSearchQuery = searchQuery.toLowerCase().trim()
   useEffect(() => {
     const fetchData = async () => {
-      if (searchQuery !== '') {
+      if (formattedSearchQuery !== '') {
         try {
           const q = query(
             collection(db, 'Database'),
             orderBy('email'),
-            startAt(searchQuery),
-            endAt(searchQuery + '\uf8ff'),
+            startAt(formattedSearchQuery),
+            endAt(formattedSearchQuery + '\uf8ff'),
             limit(10)
           );
 
@@ -63,8 +64,8 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
         const q = query(
           collection(db, 'Database'),
           orderBy('email'),
-          startAt(searchQuery),
-          endAt(searchQuery + '\uf8ff'),
+          startAt(formattedSearchQuery),
+          endAt(formattedSearchQuery + '\uf8ff'),
           startAfter(lastVisibleDoc),
           limit(10)
         );
@@ -83,7 +84,7 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
   };
 
   const handleSearch = (newSearchQuery) => {
-    setSearchQuery(newSearchQuery.trim());
+    setSearchQuery(newSearchQuery);
     setLastVisibleDoc(null); // Reset lastVisibleDoc when the search query changes
     if (newSearchQuery.trim() === '') {
       console.log('please enter a value');

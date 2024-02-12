@@ -20,6 +20,7 @@ function EditUser() {
   const [data, setData] = useState([])
   const [newProfilePhoto, setNewProfilePhoto] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [previewIDImage, setPreviewIDImage] = useState(null);
   const [newIdProofFile, setNewIdProofFile] = useState(null);
 
   const [excelFile , setExcelFile] = useState ("")
@@ -43,6 +44,7 @@ function EditUser() {
     const yourCollection = collection(db,'Database');
 
     // Sample data for all documents
+
     const allDocumentsData = CollectionData
 
     // Add all documents to the collection
@@ -78,6 +80,13 @@ function EditUser() {
   const handleIdProofFileChange = (e) => {
     e.preventDefault();
     setNewIdProofFile(e.target.files[0]);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewIDImage(reader.result);
+    };
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
     // setPreviewImage(URL.createObjectURL(e.target.files[0]));
   };
 
@@ -201,10 +210,6 @@ function EditUser() {
     }
   };
   // console.log(id);
-      const handleInputFileChange = (e) => {
-        e.preventDefault()
-        setExcelFile (e.target.files[0])
-      };
 
   return (
     <div className="h-screen w-screen flex items-center rounded-md shadow-md">
@@ -255,7 +260,7 @@ function EditUser() {
                             /> */}
 
                             {/* Display the existing ID proof */}
-                            <img src={currentDataFromFirebase?.idProof} alt="ID Proof" style={{ maxWidth: '100%' }} />
+                            {/* <img src={currentDataFromFirebase?.idProof} alt="ID Proof" style={{ maxWidth: '100%' }} /> */}
 
                   {/* Input field for selecting a new ID proof file */}
                   <input
@@ -266,9 +271,9 @@ function EditUser() {
                   />
 
                   {/* Display the preview of the new ID proof file */}
-                {previewImage && (
-                <img src={currentDataFromFirebase.idProof} alt="New ID Proof Preview" className="w-48 h-48 rounded-full border-solid border-[#8DC162] border-4 object-cover" />
-                )}
+                {previewIDImage ? (
+                <img src={previewIDImage} alt="New ID Proof Preview" className="w-48 h-48 rounded-full object-fill overflow-hidden" />
+                ):(<img src={currentDataFromFirebase.idProof} alt="ID Proof" className="w-48 h-48 rounded-full object-cover" />)}
 
                 {/* Button to update the ID proof */}
               {/* <button
@@ -316,23 +321,6 @@ function EditUser() {
               <div className="w-1/3">
               <input type="text" name="gender" className="w-full mb-2 border-b-2 outline-none bg-transparent" placeholder="Gender" value={currentDataFromFirebase.gender} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, gender: e.target.value })}/>
             </div>
-            <div className="w-1/3">
-              {/* <input type="text" name="gender" className="w-full mb-2 border-b-2 outline-none bg-transparent" placeholder="Gender" value={currentDataFromFirebase.gender} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, gender: e.target.value })}/> */}
-            </div>
-            {/* <div className="w-1/4">
-              <div className="w-32 first-letter flex items-center border-solid border-red-400 border-2 p-1 rounded-md gap-1">
-              <CiImport className="text-red-700 text-lg " onClick={handleImportData} />
-              <input type="file" accept=".xlsx, .xls" onChange={handleInputFileChange} className=""/>
-              </div>
-            </div> */}
-            {/* <div className="w-1/5">
-              <div className="w-32 first-letter flex items-center border-solid border-green-400 border-2 p-1 rounded-md gap-1">
-              <CiExport className="text-green-700 text-lg"/>
-              {data.length > 0 && (
-              <button onClick={handleExportData} className="font-semibold">Export Data</button>
-              )}
-              </div>
-            </div> */}
           </div>
           <div>
             <div className="p-4 rounded-lg shadow-lg ">
@@ -401,7 +389,7 @@ function EditUser() {
             </div>
         </div>
             <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleSubmit}>Update</button>
-            <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleMigrateCollection}>Upload</button>
+            {/* <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleMigrateCollection}>Upload</button> */}
           </div>
         </div>
        </div>       

@@ -66,6 +66,7 @@ function LoginPage() {
                   userDispatch(addUser(filteredUser))
                   setLoggedIn(true);
                   localStorage.setItem('userToken', filteredUser.token);
+                  localStorage.setItem('currentUserEmail', filteredUser.email)
                   
               }
             })

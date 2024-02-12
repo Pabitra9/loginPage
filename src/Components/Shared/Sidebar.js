@@ -11,30 +11,35 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
   const navigate = useNavigate();
   const [userDisplayName, setUserDisplayName] = useState('');
 
-  const extractUserName = (email) => {
+  const extractUserName = async (email) => {
+    if (!email) {
+      return null; // or handle this case in a way that makes sense for your application
+    }
+  
     // Assuming email is in the format 'username@example.com'
-    const usernameWithoutDots = email.split('@')[0].replace(/\./g, ' ');
+    const usernameWithoutDots = await email.split('@')[0].replace(/\./g, ' ');
     // Capitalize the first letter of each word
     return usernameWithoutDots.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
   };
-
-   useEffect(() => {
-    const fetchUserEmail = async () => {
-      try {
-        const userEmail = localStorage.getItem('currentUserEmail');
-        if (userEmail) {
-          const displayName = await extractUserName(userEmail);
-          setUserDisplayName(displayName);
-        } else {
-          console.error('User email not found in localStorage');
-        }
-      } catch (error) {
-        console.error('Error fetching user email:', error);
+  const userEmail = localStorage.getItem('currentUserEmail');
+  
+  const fetchUserEmail = async () => {
+    try {
+      console.log(userEmail);
+      if (userEmail) {
+        const displayName = await extractUserName(userEmail);
+        setUserDisplayName(displayName);
+      } else {
+        console.error('User email not found in localStorage');
       }
-    };
-
+    } catch (error) {
+      console.error('Error fetching user email:', error);
+    }
+  };
+  useEffect(() => {
+  
     fetchUserEmail();
-  }, []); // Empty dependency array ensures the effect runs only once on mount
+  }, [userEmail]); // Empty dependency array ensures the effect runs only once on mount
   
   const handleLogOut = async () => {
     try {
@@ -58,7 +63,12 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
     <div className="flex flex-col w-64 p-3 text-white relative">
       <HiX className='text-2xl absolute left-56 top-14 hidden mobile:flex overflow-hidden' onClick={() => setSidebarOpen(!isSidebarOpen)}/>
         <div className='flex items-center justify-start my-8 pb-2 gap-4 border-b'>
-            <img src={profilePic} className='w-10 cursor-pointer'/>
+            {/* <img src={profilePic} className='w-10 cursor-pointer'/> */}
+            {userDisplayName && (
+          <div className='w-14 h-12 rounded-[100%] bg-[#8dc14e] flex items-center justify-center'>
+            <span className='text-white text-lg font-semibold'>{userDisplayName.charAt(0)}</span>
+          </div>
+        )}
             <span className='text-xl font-semibold text-white'>{userDisplayName}</span>
             {/* {console.log(userCredentialFromFirebase)} */}
             </div>
