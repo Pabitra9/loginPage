@@ -70,22 +70,36 @@ const Tabulator = () => {
   }, [user, userCollectionRef]);
  
     useEffect(() => {
-      fetchData();
+      if (!searchResults || searchResults?.length === 0) {
+        fetchData();
+      }
+      else{
+        let totalCountSnapshot;
+        totalCountSnapshot =  { data: { count: searchResults.length } };
+          //totalCountSnapshot =  searchResults.length
+          console.log(totalCountSnapshot);
+          const totalCount = totalCountSnapshot.data.count;
+         console.log(totalCount);
+         setTotalNoOfData(totalCount);
+         const totalPages = Math.ceil(totalCount / itemsPerPage) 
+         setTotalNoOfPagecount(totalPages);
+
+      }
       console.log('Data Fetch Hela');
-  }, [currentPage]); 
+  }, [currentPage, searchResults]); 
     const fetchData = async () => {
       try {
         setIsLoading(true);
         console.log(lastVisible);
        
-        const totalCountSnapshot = await getCountFromServer(collection(db, 'Database'));
-        const totalCount = totalCountSnapshot.data().count;
-        console.log(totalCount);
-        setTotalNoOfData(totalCount)
-        // Calculate the total pages
-        const totalPages = Math.ceil(totalCount / itemsPerPage);
-        console.log(totalPages);
-        setTotalNoOfPagecount(totalPages)
+        let totalCountSnapshot;
+          totalCountSnapshot = await getCountFromServer(collection(db, 'Database'));
+          const totalCount = totalCountSnapshot.data().count;
+         console.log(totalCount);
+         setTotalNoOfData(totalCount);
+         const totalPages = Math.ceil(totalCount / itemsPerPage);
+         setTotalNoOfPagecount(totalPages);
+        
         let queryData;
         if (lastVisible) {
           queryData = query(
@@ -205,7 +219,7 @@ const Tabulator = () => {
       setData(updatedSearchResults);
        } else {
         // If no more search results, fetch and update with the full data
-       fetchData();
+       //fetchData();
       
       }
         console.log('User confirmed');
@@ -221,7 +235,7 @@ const Tabulator = () => {
       <h1 className="text-2xl font-bold mb-4">Data Table</h1>
       {data.length>0 &&(<button type="submit" className="bg-[#2960a1] flex items-center gap-1 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={fetchDataToExport}><CiExport className="text-white text-lg"/>Export to Excel</button>)}
       </div>  
-        <h1 className="text-2xl font-bold mb-4">{currentUserRole}</h1>
+        <h1 className="text-2xl font-bold mb-4">User Role : {currentUserRole}</h1>
       <table className="min-w-full bg-white rounded-lg shadow-lg">
         <thead>
           <tr>
@@ -334,17 +348,18 @@ const Tabulator = () => {
       <div>
           <span className="mr-2">
             Page {currentPage} of {totalNoOfPageCount}
-            
+            {console.log(totalNoOfPageCount)}
           </span>
           <span className="text-gray-500">
             ({totalNoOfData} items in total)
+            {console.log(totalNoOfData) }
           </span>
         </div>
         <div className="flex">
           <button
             onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
             disabled={currentPage === 1 }
-            className={`ml-2 py-2 px-4 rounded cursor-pointer ${ currentPage === 1 ? 'bg-gray-300 text-gray-700 cursor-not-allowed' : 'bg-gray-800 text-white'}`}
+            className={`ml-2 py-2 px-4 rounded ${ currentPage === 1 ? 'bg-gray-300 text-gray-700 cursor-not-allowed' : 'bg-gray-800 text-white cursor-pointer'}`}
           >
             Prev
           </button>
@@ -352,12 +367,12 @@ const Tabulator = () => {
             onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalNoOfPageCount))}
             disabled={currentPage === totalNoOfPageCount || isLoading }
 
-            className={`ml-2 py-2 px-4 rounded cursor-pointer ${
+            className={`ml-2 py-2 px-4 rounded ${
               currentPage === totalNoOfPageCount
                 ? 'bg-gray-300 text-gray-700 cursor-not-allowed'
                 : isLoading
                 ? 'bg-gray-500 text-white cursor-not-allowed'
-                : 'bg-gray-800 text-white'
+                : 'bg-gray-800 text-white cursor-pointer'
             }`}
           >
              {isLoading ? 'Loading...' : 'Next'}

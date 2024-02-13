@@ -52,6 +52,7 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
         }
       } else {
         setDisplayedData([]); // Clear displayedData when searchQuery is empty
+        console.log("No Record found");
       }
     };
 
@@ -83,7 +84,7 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
     }
   };
 
-  const handleSearch = (newSearchQuery) => {
+  const handleSearch = (newSearchQuery, e) => {
     setSearchQuery(newSearchQuery);
     setLastVisibleDoc(null); // Reset lastVisibleDoc when the search query changes
     if (newSearchQuery.trim() === '') {
@@ -108,7 +109,7 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
           />
-          <HiOutlineSearch className="text-[#475569] text-sm" onClick={loadMoreData} />
+          <HiOutlineSearch className="text-[#475569] text-sm cursor-pointer" onClick={loadMoreData} />
         </div>
       </div>
 

@@ -598,7 +598,7 @@ console.log(errors);
                                 setImgaeUpload(file);
                                 setFileSizeError(null);
                             } else {
-                                // Show an error message or take appropriate action
+                                // Show an error message or take appropriate action,,oi9iou
                                 console.error('Invalid file size. Please select a file between 20KB and 300KB.');
                                 setFileSizeError('Invalid file size. Please select a file between 20KB and 300KB.');
                             }}}
@@ -621,7 +621,6 @@ console.log(errors);
                                 // Show an error message or take appropriate action
                                 console.error('Invalid file size. Please select a file between 20KB and 300KB.');
                                 setFileSizeError('Invalid file size. Please select a file between 20KB and 300KB.');
-                               
                             }}} />
                           {/* {<p className="text-[#ff0000]">{errors.idProof}</p>}   */}
                           {fileSizeError && <p className="text-[#ff0000]">{fileSizeError}</p>}
