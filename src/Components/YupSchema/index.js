@@ -10,7 +10,7 @@ export const singUpSchema = Yup.object({
     registrationDate : Yup.date().nullable().required("Please enter your Date of Registration"),
     education : Yup.string().nullable().required('Please enter your qualification'),
     totalExperience : Yup.number().nullable().required('Please enter your Total Year of Experience'),
-    hrExperience : Yup.mixed().oneOf(['0-3', '3-5', '5-7','7 & above']).defined().nullable().required('Please enter your Total Year of Experience in HR'),
+    hrExperience : Yup.mixed().oneOf(['0-3', '3-5', '5-7','7 & Above']).defined().nullable().required('Please enter your Total Year of Experience in HR'),
     prevOrg : Yup.string().nullable().required('Please enter your Previous Organisation name'),
     currentOrg : Yup.string().nullable().required('Please enter your Current Organisation name'),
     designation : Yup.string().nullable().required('Please enter your Designation'),
