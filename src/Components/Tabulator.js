@@ -5,8 +5,6 @@ import { useLocation } from 'react-router-dom';
 import { db } from '../RegistrationForm/firebase';
 import { getDocs, collection, deleteDoc, doc ,query,limit,orderBy,startAfter, getCountFromServer} from 'firebase/firestore';
 import { useSelector } from 'react-redux';
-import { CiExport } from "react-icons/ci";
-import Papa from 'papaparse';
 
 // const ITEMS_PER_PAGE = 10;
 const Tabulator = () => {
@@ -17,16 +15,13 @@ const Tabulator = () => {
   const [totalNoOfPageCount, setTotalNoOfPagecount] = useState(1)
   const [totalNoOfData, setTotalNoOfData] = useState(1)
   const [lastVisible , setLastVisible] = useState('');
-  const [exportedData, setExportedData] = useState([])
   const [isLoading, setIsLoading] = useState(false);
 
- 
-
-  
   const location = useLocation();
   const { searchResults } = location.state || {};
   console.log(location.state);
   console.log(searchResults);
+  
   const displayData = searchResults || data;
 
   // const handleJumpToPage = () => {
@@ -68,90 +63,73 @@ const Tabulator = () => {
 
     getUserRoleList();
   }, [user, userCollectionRef]);
- 
-    useEffect(() => {
-      if (!searchResults || searchResults?.length === 0) {
-        fetchData();
-      }
-      else{
-        let totalCountSnapshot;
-        totalCountSnapshot =  { data: { count: searchResults.length } };
-          //totalCountSnapshot =  searchResults.length
-          console.log(totalCountSnapshot);
-          const totalCount = totalCountSnapshot.data.count;
-         console.log(totalCount);
-         setTotalNoOfData(totalCount);
-         const totalPages = Math.ceil(totalCount / itemsPerPage) 
-         setTotalNoOfPagecount(totalPages);
 
-      }
-      console.log('Data Fetch Hela');
-  }, [currentPage, searchResults]); 
     const fetchData = async () => {
       try {
-        setIsLoading(true);
-        console.log(lastVisible);
-       
+        setIsLoading(true)
+        const queryData = query(
+          collection(db, 'Database'),
+          orderBy('name'),
+          startAfter(lastVisible),
+          limit(itemsPerPage)
+        );
+
         let totalCountSnapshot;
-          totalCountSnapshot = await getCountFromServer(collection(db, 'Database'));
-          const totalCount = totalCountSnapshot.data().count;
-         console.log(totalCount);
-         setTotalNoOfData(totalCount);
-         const totalPages = Math.ceil(totalCount / itemsPerPage);
-         setTotalNoOfPagecount(totalPages);
-        
-        let queryData;
-        if (lastVisible) {
-          queryData = query(
-            collection(db, 'Database'),
-            orderBy('name'),
-            startAfter(lastVisible),
-            limit(10)
-          );
-        } else {
-          queryData = query(
-            collection(db, 'Database'),
-            orderBy('name'),
-            limit(10)
-          );
-        }
-    
+           totalCountSnapshot = await getCountFromServer(collection(db, 'Database'));
+           const totalCount = totalCountSnapshot.data().count;
+          console.log(totalCount);
+          setTotalNoOfData(totalCount);
+          const totalPages = Math.ceil(totalCount / itemsPerPage);
+          setTotalNoOfPagecount(totalPages);
+         
         const documentSnapshots = await getDocs(queryData);
-    
+  
         if (documentSnapshots.empty) {
           // No more data to fetch
           console.log("No data found");
           return;
-        } 
-    
+        }
+  
         // Get the last visible document
         const lastVisibleDocument = documentSnapshots.docs[documentSnapshots.docs.length - 1];
-        
+  
         // Map the data
         const fetchedData = documentSnapshots.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
+          
         }));
-        // console.log(fetchData);
-        
-        
+  
         // Combine the current data with the new data
-        setData((prevData) => (lastVisible ? [...prevData, ...fetchedData] : fetchedData));
-        // if (!lastVisible || currentPage > lastFetchedPage) {
-         
-          setLastVisible(lastVisibleDocument);
-        //   setLastFetchedPage(currentPage);
-        // }
-        setIsLoading(false); 
-        console.log(data);
-        // console.log(allData);
+        setData((prevData) =>(lastVisible ? [...prevData, ...fetchedData] : fetchedData));
+        setLastVisible(lastVisibleDocument);
+        setIsLoading(false)
       } catch (error) {
         console.error('Error fetching data:', error);
-        setIsLoading(false); 
+      }finally {
+        // Set loading to false regardless of success or failure
+        setIsLoading(false);
       }
     };
-    console.log(currentPage);
-    // fetchData();
+  
+    useEffect(() => {
+      if (!searchResults || searchResults?.length === 0) {
+               fetchData();
+             }
+             else{
+                     let totalCountSnapshot;
+                     totalCountSnapshot =  { data: { count: searchResults.length } };
+                       //totalCountSnapshot =  searchResults.length
+                       console.log(totalCountSnapshot);
+                       const totalCount = totalCountSnapshot.data.count;
+                      console.log(totalCount);
+                      setTotalNoOfData(totalCount);
+                      const totalPages = Math.ceil(totalCount / itemsPerPage) 
+                      setTotalNoOfPagecount(totalPages);
+                      setCurrentPage(1)
+                   }
+    }, [currentPage , searchResults ]);
+
   
   //Calculate the index range for the current page
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -164,78 +142,32 @@ const Tabulator = () => {
   const currentPageData =  displayData.slice(startIndex, endIndex);
    console.log(currentPageData);
 
-  useEffect(() => {
-    if (exportedData.length > 0) {
-      console.log('Data ready for export:', exportedData);
-      exportToCSV();
-    }
-  }, [exportedData]);
-    const fetchDataToExport = async () => {
-      try {
-        const exportData = query(collection(db,'Database'),limit(100))
-        const querySnapshot = await getDocs(exportData);
-  
-        const allData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-  
-        setExportedData(allData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-      
-      const exportToCSV = () => {
-        const csv = Papa.unparse(exportedData,{ header: true
-       // columns: ['id', 'status', /* other fields */] // Explicitly specify columns
-       });
-        // console.log(csv);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.href = url;
-        link.setAttribute('download', 'firebase_data.csv');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      };
-
-
   const handleDeleteClick = async (id) => {
-      const result = window.confirm('Are you sure you want to proceed?');
-      if (result) {
-        const deleteValue = doc(db, 'Database', id);
-        await deleteDoc(deleteValue);
-        // const updatedData = currentPageData.filter(res => res.id != id);
-        // setData(updatedData);
-        // Remove the deleted item from search results
-        console.log(searchResults);
-      const updatedSearchResults = searchResults ? searchResults.filter(item => item.id !== id) : null;
-        console.log(updatedSearchResults);
-      // Update the UI based on the presence of search results
-      if (updatedSearchResults && updatedSearchResults.length > 0) {
-      // If there are remaining search results, update the state
-      setData(updatedSearchResults);
-       } else {
-        // If no more search results, fetch and update with the full data
-       //fetchData();
-      
+    const result = window.confirm('Are you sure you want to proceed?');
+    if (result) {
+      const deleteValue = doc(db, 'Database', id);
+      await deleteDoc(deleteValue);
+  
+      const updatedData = data?.filter(res => res.id != id);
+      setData(updatedData);
+  
+      // If search results exist, update them as well
+      if (location.state && location.state.searchResults && location.state.searchResults.length > 0) {
+        const updatedSearchResults = location.state.searchResults.filter(item => item.id !== id);
+        // Update the location state with the updated search results
+        location.state.searchResults = updatedSearchResults;
       }
-        console.log('User confirmed');
-      } else {
-        console.log('User canceled');
-      }
+    } else {
+      console.log('User canceled');
+    }
   };
-
-
+  
   return (
     <div className="min-h-screen mx-auto p-4">
     <div className='flex justify-between'>
-      <h1 className="text-2xl font-bold mb-4">Data Table</h1>
-      {data.length>0 &&(<button type="submit" className="bg-[#2960a1] flex items-center gap-1 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={fetchDataToExport}><CiExport className="text-white text-lg"/>Export to Excel</button>)}
+      {/* <h1 className="text-2xl font-bold mb-4">Data Table</h1> */}
       </div>  
-        <h1 className="text-2xl font-bold mb-4">User Role : {currentUserRole}</h1>
+        {/* <h1 className="text-2xl font-bold mb-4">User Role : {currentUserRole}</h1> */}
       <table className="min-w-full bg-white rounded-lg shadow-lg">
         <thead>
           <tr>
@@ -334,13 +266,20 @@ const Tabulator = () => {
 ) : (
   <tr>
     <td colSpan="5" className="px-4 py-2 text-center text-gray-500">
-    {totalNoOfData > 0 ? 'Loading ...' : 'No results found.'}
+   
+    {searchResults?.length === 0 ? 'No result found.': ''}
     </td>
   </tr>
 )}
 
         </tbody>
       </table>
+
+      {isLoading && (
+        <div className="flex items-center justify-center mt-4">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      )}
 
       {/* Pagination controls & Information*/}
       <div className="flex justify-between items-center mt-4">
@@ -358,8 +297,8 @@ const Tabulator = () => {
         <div className="flex">
           <button
             onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
-            disabled={currentPage === 1 }
-            className={`ml-2 py-2 px-4 rounded ${ currentPage === 1 ? 'bg-gray-300 text-gray-700 cursor-not-allowed' : 'bg-gray-800 text-white cursor-pointer'}`}
+            disabled={currentPage === 1 || isLoading }
+            className={`ml-2 py-2 px-4 rounded ${ currentPage === 1 || isLoading ? 'bg-gray-300 text-gray-700 cursor-not-allowed' : 'bg-gray-800 text-white cursor-pointer'}`}
           >
             Prev
           </button>
@@ -375,7 +314,7 @@ const Tabulator = () => {
                 : 'bg-gray-800 text-white cursor-pointer'
             }`}
           >
-             {isLoading ? 'Loading...' : 'Next'}
+             {/* {isLoading ? 'Loading...' : 'Next'} */}Next
           </button>
         </div>
         {/* <div className="flex items-center">

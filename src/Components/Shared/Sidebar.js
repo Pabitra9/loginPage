@@ -5,10 +5,16 @@ import { firebaseAuth } from '../../RegistrationForm/firebase';
 import { signOut } from 'firebase/auth';
 import profilePic from '../../Profile.png'
 import { useState , useEffect } from 'react';
+import { CiExport } from "react-icons/ci";
+import { db } from '../../RegistrationForm/firebase';
+import { getDocs, collection, deleteDoc, doc ,query,limit,orderBy,startAfter, getCountFromServer} from 'firebase/firestore';
+import Papa from 'papaparse';
 
 const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [exportedData, setExportedData] = useState([])
+  const [highlight, setHighlight] = useState(false);
   const [userDisplayName, setUserDisplayName] = useState('');
 
   const extractUserName = async (email) => {
@@ -59,8 +65,45 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
 
   };
 
+  useEffect(() => {
+    if (exportedData.length > 0) {
+      console.log('Data ready for export:', exportedData);
+      exportToCSV();
+    }
+  }, [exportedData]);
+    const fetchDataToExport = async () => {
+      try {
+        const exportData = query(collection(db,'Database'),limit(100))
+        const querySnapshot = await getDocs(exportData);
+  
+        const allData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+  
+        setExportedData(allData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+      
+      const exportToCSV = () => {
+        const csv = Papa.unparse(exportedData,{ header: true
+       // columns: ['id', 'status', /* other fields */] // Explicitly specify columns
+       });
+        // console.log(csv);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', 'firebase_data.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
   return (
-    <div className="flex flex-col w-64 p-3 text-white relative">
+    <div className="flex flex-col w-64 p-3 text-white h-screen relative">
       <HiX className='text-2xl absolute left-56 top-14 hidden mobile:flex overflow-hidden' onClick={() => setSidebarOpen(!isSidebarOpen)}/>
         <div className='flex items-center justify-start my-8 pb-2 gap-4 border-b'>
             {/* <img src={profilePic} className='w-10 cursor-pointer'/> */}
@@ -73,9 +116,9 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
             {/* {console.log(userCredentialFromFirebase)} */}
             </div>
       {/* <h1 className=" text-2xl font-semibold m-5 pb-4 ">Sidebar</h1> */}
-      <div className="flex-1 ">
+      <div className="flex flex-col">
           <Link to={'/dashboard'}>
-        <div className={`flex pl-10 items-center gap-1 p-3 m-1 ${location.pathname === '/dashboard' ? 'bg-slate-400 rounded-md' : 'hover:bg-slate-400 hover:rounded-md'}`}>
+        <div className={`flex pl-10 items-center gap-2 p-3 m-1 ${location.pathname === '/dashboard' ? 'bg-slate-400 rounded-md' : 'hover:bg-slate-400 hover:rounded-md'}`}>
             <HiViewGrid className="text-lg" />
           <span>
             Dashboard
@@ -83,16 +126,20 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
         </div>
           </Link>
 
-          {/* <Link to={'/menu1'}>
-        <div className={`flex pl-10 items-center gap-1 p-3 m-1 ${location.pathname === '/menu1' ? 'bg-slate-400 rounded-md' : 'hover:bg-slate-400 hover:rounded-md'}`}>
-            <HiMenu className="text-lg" />
-          <span>
-            Menu1
-          </span>
-        </div>
-          </Link>
+          {/* <Link to={'/menu1'}> */}
+          <button className={`flex pl-10 items-center gap-2 p-3 m-1 ${highlight ? 'bg-slate-400 rounded-md' : 'hover:bg-slate-400 hover:rounded-md'}`}
+         onClick={() => {
+        fetchDataToExport();
+        setHighlight(true);
+      }}>
+            <CiExport className="text-lg" /> 
+           <span>
+            Export Data
+          </span> 
+        </button>
+          {/* </Link> */}
 
-          <Link to={'/menu2'}>
+          {/* <Link to={'/menu2'}>
         <div className={`flex pl-10 items-center gap-1 p-3 m-1 ${location.pathname === '/menu2' ? 'bg-slate-400 rounded-md' : 'hover:bg-slate-400 hover:rounded-md'}`}>
             <HiMenu className="text-lg" />
           <span>
@@ -103,7 +150,7 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
       </div>
       {/* <div className="flex pl-10 items-center gap-1 p-3"> */}
           {/* <Link to={'/login'}> */}
-        <div className="flex items-center justify-center gap-2 p-3 m-1 bg-[#8dc14e] rounded-md cursor-pointer" onClick={handleLogOut}>
+        <div className="flex items-center justify-center gap-2 p-3 m-1 bg-[#ffffff] hover:bg-[#E41B17] hover:text-white rounded-md mt-auto cursor-pointer text-blue-900" onClick={handleLogOut}>
             <HiOutlineLogout className="text-lg font-extrabold" />
             <span className='font-bold text-sm'>Log Out</span>
         </div>

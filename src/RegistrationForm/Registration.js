@@ -2,12 +2,13 @@ import React from "react";
 import Country from './Countries'
 import { useState, useEffect } from "react";
 import { db } from "./firebase";
-import {collection,getDocs,addDoc} from 'firebase/firestore'
+import {collection,addDoc} from 'firebase/firestore'
 import { storage } from "./firebase";
 import { ref , uploadBytes, getDownloadURL, } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import { singUpSchema } from "../Components/YupSchema";
+
 
 const countries = [ 
   {name: 'Afghanistan', code: 'AF'}, 
@@ -259,47 +260,16 @@ const countries = [
 ]
 
 function Registration() {
-    
+   
   const [selectedCountry, setSelectedCountry] = useState('');
   const [isDataStored, setIsDataStored] = useState(false);
-//   const fileInputRef = useRef(null);
-//   const [downloadedProfilePictureUrl, setDownloadProfilePictureUrl] = useState()
-// const [isFilled, setLIsFilled] = useState(false);
+  const [fileSizeErrorForImageUpload, setFileSizeErrorForImageUpload] = useState(null);
+  const [fileSizeErrorForIdProof, setFileSizeErrorForIdProof] = useState(null);
 
   const handleCountryChange = (event) => {
     setSelectedCountry(event.target.value);
   };
-
-  
   const navigate = useNavigate()
-
-//   const [formData,setFormData] = useState ({
-//     name : "",
-//     dob : "",
-//     email : "",
-//     phone : "",
-//     alternativePhone : "",
-//     gender : "",
-//     streetAddress : "",
-//     addressLine2 : "",
-//     city : "",
-//     state : "",
-//     zipcode : "",
-//     country : "",
-//     certificationProgram : "",
-//     registrationDate : "",
-//     education : "",
-//     totalExperience : "",
-//     hrExperience : "",
-//     prevOrg : "",
-//     currentOrg : "",
-//     designation : "",
-//     linkedin : "",
-//     howFound : "",
-//     // image : "",
-//     // idProof : "",
-//     certificationNumber : ""
-//   })
 
   const initialValues = {
         name : "",
@@ -342,57 +312,31 @@ function Registration() {
 })
 console.log(errors);
 
-
- 
-
   const [imageUpload,setImgaeUpload] = useState(null)
   const [idproof,setIdproof] = useState(null)
-
   const usersData = collection(db,"Database")
-
-
-//   let name , value
-//   const handleChange  = (e) => {
-//     name = e.target.name
-//     value = e.target.value
-//     setFormData ({...formData,[name]:value})
-//   }
-
-  
-  
-//   const uploadImage = async (file) => {
-//     // const storage = getStorage(firebase);
-//     const storageRef = ref(storage, `image/${imageUpload.name}`);
-  
-//     await uploadBytes(storageRef, file);
-  
-//     const downloadUrl = await getDownloadURL(storageRef);
-//     return downloadUrl;
-//   };
 
   useEffect(() => {
     console.log(imageUpload);
     console.log(idproof);
   }, [imageUpload,idproof])
   
+  function validateFileSize(file, minSizeKB, maxSizeKB) {
+    const fileSizeKB = file.size / 1024;
+    return fileSizeKB >= minSizeKB && fileSizeKB <= maxSizeKB;
+}
   
   const handleSubmitData = async(e) => {
       e.preventDefault ();
       handleSubmit();
     //   setIsDataStored(true)
       // uploadImage()
-      
-      
-
                   const imgRef = ref(storage,`image/${imageUpload?.name}`)
                   await uploadBytes(imgRef,imageUpload)
                   const idRef = ref(storage,`idCopy/${idproof?.name}`)
                   await uploadBytes(idRef,idproof)
                   const downloadProfileUrl = await getDownloadURL(imgRef);
                   const downloadIdDocumentUrl = await getDownloadURL(idRef);
-              
-  
-        
 
         // setDownloadProfilePictureUrl(downloadUrl)
         console.log(e);
@@ -425,8 +369,7 @@ console.log(errors);
     
              catch (error) {
                 setIsDataStored(false)
-                console.error('Error adding document:', error);  
-                
+                console.error('Error adding document:', error);      
             } 
             }
         }else{
@@ -435,8 +378,6 @@ console.log(errors);
         }
             
           }
-
-
 
   return (
     <div className="font-roboto bg-gray-100 p-4">
@@ -653,19 +594,39 @@ console.log(errors);
                         
                         onChange={(e)=>{
                             e.preventDefault();
-                            setImgaeUpload(e.target.files[0])}}
+                            const file = e.target.files[0];
+                            if (file && validateFileSize(file, 20, 300)) {
+                                setImgaeUpload(file);
+                                setFileSizeErrorForImageUpload(null);
+                            } else {
+                                // Show an error message or take appropriate action
+                                console.error('Invalid file size. Please select a file between 20KB and 300KB.');
+                              { setFileSizeErrorForImageUpload('Invalid file size. Please select a file between 20KB and 300KB.')}
+                            }}}
 
                             />
                             {/* {<p className="text-[#ff0000]">{errors.image}</p>} */}
-                        
+                            {fileSizeErrorForImageUpload && <p className="text-[#ff0000]">{fileSizeErrorForImageUpload}</p>}
+                            <p className="block text-[#5D6572] font-semibold mb-2 text-sm">File must be in jpg, png and should be between 20KB - 300KB file size</p> 
                     </div>
     
                     {/* <!-- Your Id Proof Field --> */}
                     <div className="mb-4">
                         <label for="idProof" className="block text-[#5D6572] font-semibold mb-2 text-sm">Your Id Proof <span className="text-[#ff0000]">*</span></label>
-                        <input type="file" id="idProof" name="idProof" accept=".pdf , .docx" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required onChange={(e)=>{ e.preventDefault()
-                            setIdproof(e.target.files[0])}} />
+                        <input type="file" id="idProof" name="idProof" accept="image/*" className="w-full px-3 py-2 border-[#E2E8F0] border-[1px] rounded-md focus:outline-none focus:outline-4 focus:outline-[#bfd3e8] transition-all duration-75 ease-linear" required onChange={(e)=>{ e.preventDefault()
+                             const file = e.target.files[0];
+                            if (file && validateFileSize(file, 20, 300)) {
+                                setIdproof(file);
+                                setFileSizeErrorForIdProof(null);
+                            } else {
+                                // Show an error message or take appropriate action
+                                console.error('Invalid file size. Please select a file between 20KB and 300KB.');
+                              { setFileSizeErrorForIdProof('Invalid file size. Please select a file between 20KB and 300KB.')}
+                               
+                            }}} />
                           {/* {<p className="text-[#ff0000]">{errors.idProof}</p>}   */}
+                          {fileSizeErrorForIdProof && <p className="text-[#ff0000]">{fileSizeErrorForIdProof}</p>}
+                            <p className="block text-[#5D6572] font-semibold mb-2 text-sm">File must be in jpg, png and should be between 20KB - 300KB file size</p>
                     </div>
     
                     {/* <!-- Certification Number Field --> */}
