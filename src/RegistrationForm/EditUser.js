@@ -250,7 +250,7 @@ function EditUser() {
                     </div>
                   </div>  
               </div>
-                   <div className="flex justify-center items-center">
+                   <div className="flex justify-center items-center flex-col">
                         <div className="w-72 h-20 border-2 border-solid border-white rounded-md">
                             {/* <HiDocument className="w-32 h-20"/> */}
                             {/* <input
@@ -263,17 +263,12 @@ function EditUser() {
                             {/* <img src={currentDataFromFirebase?.idProof} alt="ID Proof" style={{ maxWidth: '100%' }} /> */}
 
                   {/* Input field for selecting a new ID proof file */}
-                  <input
-                  type="file"
-                  accept=".jpg,.png,image/*"
-                  onChange={handleIdProofFileChange}
-                  className=""
-                  />
+                 
 
                   {/* Display the preview of the new ID proof file */}
                 {previewIDImage ? (
-                <img src={previewIDImage} alt="New ID Proof Preview" className="w-48 h-48 rounded-full object-fill" />
-                ):(<img src={currentDataFromFirebase.idProof} alt="ID Proof" className="w-48 h-48 rounded-full object-cover" />)}
+                <img src={previewIDImage} alt="New ID Proof Preview" className="w-48 h-48 object-cover" />
+                ):(<img src={currentDataFromFirebase.idProof} alt="ID Proof" className="w-48 h-48  object-cover" />)}
 
                 {/* Button to update the ID proof */}
               {/* <button
@@ -286,6 +281,12 @@ function EditUser() {
                         </div>
                     {/* <p>{currentDataFromFirebase.idProof}</p> */}
                     {/* {console.log({currentDataFromFirebase.idProof})}; */}
+                    <input
+                  type="file"
+                  accept=".jpg,.png,image/*"
+                  onChange={handleIdProofFileChange}
+                  className=""
+                  />
 
                    </div>
             </div>

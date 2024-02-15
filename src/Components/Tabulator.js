@@ -15,14 +15,16 @@ const Tabulator = () => {
   const [totalNoOfPageCount, setTotalNoOfPagecount] = useState(1)
   const [totalNoOfData, setTotalNoOfData] = useState(1)
   const [lastVisible , setLastVisible] = useState('');
+  const [dashboardData, setDashboardData] = useState([])
+  const [searchedData, setSearchedData] = useState([])
   const [isLoading, setIsLoading] = useState(false);
 
-  const location = useLocation();
-  const { searchResults } = location.state || {};
-  console.log(location.state);
-  console.log(searchResults);
+  // const location = useLocation();
+  // const { searchResults } = location.state || {};
+  // console.log(location.state);
+  // console.log(searchResults);
   
-  const displayData = searchResults || data;
+  
 
   // const handleJumpToPage = () => {
   //   const pageNumber = parseInt(jumpToPage, 10);
@@ -39,6 +41,11 @@ const Tabulator = () => {
     return storedRole || '';
   });
   const user = useSelector((state) => state.user.currentUser);
+
+ const searchResult = useSelector((state)=>state.search.currentSearchResult)
+ console.log(searchResult);
+
+ //const displayData = searchResult || data;
 
   const userCollectionRef = collection(db, 'UserCredential');
 
@@ -74,9 +81,8 @@ const Tabulator = () => {
           limit(itemsPerPage)
         );
 
-        let totalCountSnapshot;
-           totalCountSnapshot = await getCountFromServer(collection(db, 'Database'));
-           const totalCount = totalCountSnapshot.data().count;
+          const totalCountSnapshot = await getCountFromServer(collection(db, 'Database'));
+          const totalCount = totalCountSnapshot.data().count;
           console.log(totalCount);
           setTotalNoOfData(totalCount);
           const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -104,43 +110,76 @@ const Tabulator = () => {
         setData((prevData) =>(lastVisible ? [...prevData, ...fetchedData] : fetchedData));
         setLastVisible(lastVisibleDocument);
         setIsLoading(false)
+        //Calculate the index range for the current page
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        console.log(startIndex);
+        const endIndex = startIndex + itemsPerPage;
+        console.log(endIndex);
+  
+        // Get the data to display on the current page
+        //const currentPageData = displayData.slice(startIndex, endIndex);
+        //console.log(data);
+        const displayData = data;
+        const currentPageData =  displayData?.slice(startIndex, endIndex);
+        setDashboardData(currentPageData)
+        console.log(currentPageData);
       } catch (error) {
         console.error('Error fetching data:', error);
-      }finally {
-        // Set loading to false regardless of success or failure
-        setIsLoading(false);
-      }
+        setDashboardData([])
+       }
+       //finally {
+      //   // Set loading to false regardless of success or failure
+      //   setIsLoading(false);
+      // }
     };
   
     useEffect(() => {
-      if (!searchResults || searchResults?.length === 0) {
+       //if (!searchResult || searchResult?.length === 0) {
                fetchData();
-             }
-             else{
-                     let totalCountSnapshot;
-                     totalCountSnapshot =  { data: { count: searchResults.length } };
-                       //totalCountSnapshot =  searchResults.length
-                       console.log(totalCountSnapshot);
-                       const totalCount = totalCountSnapshot.data.count;
-                      console.log(totalCount);
-                      setTotalNoOfData(totalCount);
-                      const totalPages = Math.ceil(totalCount / itemsPerPage) 
-                      setTotalNoOfPagecount(totalPages);
-                      setCurrentPage(1)
-                   }
-    }, [currentPage , searchResults ]);
+            //  }
+            //  else{
+            //          let totalCountSnapshot;
+            //          totalCountSnapshot =  searchResult.length
+            //            //totalCountSnapshot =  searchResults.length
+            //            console.log(totalCountSnapshot);
+            //            const totalCount = totalCountSnapshot;
+            //           console.log(totalCount);
+            //           setTotalNoOfData(totalCount);
+            //           const totalPages = Math.ceil(totalCount / itemsPerPage) 
+            //           setTotalNoOfPagecount(totalPages);
+            //           setCurrentPage(1)
+            //        }
+    }, [currentPage]);
 
+  // useEffect(() => {
+  //   if(searchResult && searchResult?.length > 0){
+      
+  //                 const totalSearchCount =  searchResult.length
+  //                console.log(totalSearchCount);
+  //                 const totalCount = totalSearchCount;
+  //                console.log(totalCount);
+  //                setTotalNoOfData(totalCount);
+  //                const totalPages = Math.ceil(totalCount / itemsPerPage) 
+  //                setTotalNoOfPagecount(totalPages);
+  //                setCurrentPage(1)
+
+  //                const startIndex = (currentPage - 1) * itemsPerPage;
+  //                 console.log(startIndex);
+  //                 const endIndex = startIndex + itemsPerPage;
+  //                 console.log(endIndex);
   
-  //Calculate the index range for the current page
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  console.log(startIndex);
-  const endIndex = startIndex + itemsPerPage;
-  console.log(endIndex);
+  //                 // Get the data to display on the current page
+  //                 //const currentPageData = displayData.slice(startIndex, endIndex);
+  //                 const displayData = searchResult;
+  //                 const currentPageData =  displayData?.slice(startIndex, endIndex);
+  //                 setSearchedData(currentPageData)
+  //                 console.log(currentPageData);
+  //                 console.log(searchedData);
+  //   }
 
-  // Get the data to display on the current page
-  //const currentPageData = displayData.slice(startIndex, endIndex);
-  const currentPageData =  displayData.slice(startIndex, endIndex);
-   console.log(currentPageData);
+  // },[])
+  
+  
 
   const handleDeleteClick = async (id) => {
     const result = window.confirm('Are you sure you want to proceed?');
@@ -151,12 +190,12 @@ const Tabulator = () => {
       const updatedData = data?.filter(res => res.id != id);
       setData(updatedData);
   
-      // If search results exist, update them as well
-      if (location.state && location.state.searchResults && location.state.searchResults.length > 0) {
-        const updatedSearchResults = location.state.searchResults.filter(item => item.id !== id);
-        // Update the location state with the updated search results
-        location.state.searchResults = updatedSearchResults;
-      }
+      // // If search results exist, update them as well
+      // if (location.state && location.state.searchResults && location.state.searchResults.length > 0) {
+      //   const updatedSearchResults = location.state.searchResults.filter(item => item.id !== id);
+      //   // Update the location state with the updated search results
+      //   location.state.searchResults = updatedSearchResults;
+      // }
     } else {
       console.log('User canceled');
     }
@@ -179,8 +218,8 @@ const Tabulator = () => {
           </tr>
         </thead>
         <tbody>
-        {searchResults && searchResults.length > 0  ? (
-     searchResults.map((result, index) => (
+        {searchedData && searchedData?.length > 0  ? (
+     searchedData?.map((result, index) => (
     <tr key={index} className={index % 2 === 0 ? 'bg-[#F1F5F9] border-b border-t' : ''}>
       <td className="px-4 py-2 text-left capitalize">{result.name}</td>
       <td className="px-4 py-2 text-left">{result.email}</td>
@@ -221,8 +260,8 @@ const Tabulator = () => {
       </td>
     </tr>
   ))
-) :  currentPageData.length > 0 ? (
-  currentPageData.map((item, index) => (
+) :  dashboardData?.length > 0 ? (
+  dashboardData?.map((item, index) => (
     <tr key={item.id} className={index % 2 === 0 ? 'bg-[#F1F5F9] border-b border-t' : ''}>
       <td className="px-4 py-2 text-left capitalize">{item.name}</td>
       <td className="px-4 py-2 text-left">
@@ -267,7 +306,7 @@ const Tabulator = () => {
   <tr>
     <td colSpan="5" className="px-4 py-2 text-center text-gray-500">
    
-    {searchResults?.length === 0 ? 'No result found.': ''}
+    {/* {searchResult?.length === 0 ? 'No result found.': ''} */}
     </td>
   </tr>
 )}
