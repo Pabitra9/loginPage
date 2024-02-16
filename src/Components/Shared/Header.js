@@ -15,8 +15,6 @@ import {
 import chrmpLogo from '../../CHRMP Logo - Tagline.svg';
 import { db } from '../../RegistrationForm/firebase';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { addSearchResult } from '../../Redux/SearchSlice';
 
 
 
@@ -30,15 +28,6 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
   //const [searchResults, setSearchResults] = useState([]);
   //const [typingTimeout, setTypingTimeout] = useState(null);
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if (location.state && location.state.searchResults) {
-  //     // Handle the search results here
-  //     setSearchResults(location.state.searchResults);
-  //     console.log(location.state.searchResults);
-  //   }
-  // }, [location.state]);
-   const searchDispatch = useDispatch()
 
   const handleSearch = async () => {
     const trimmedSearchValue = searchValue.trim().toLowerCase();
@@ -58,13 +47,11 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
         ...doc.data(),
       }));
       //setSearchResults(results);
-     // navigate('/dashboard', { state: { searchResults: results  } });
-     searchDispatch(addSearchResult(results));
+      navigate('/dashboard', { state: { searchResults: results  } });
      }
     else{
       navigate('/dashboard')
       //setSearchResults([])
-      searchDispatch(addSearchResult([]));
       
     }
   };
@@ -74,7 +61,6 @@ const Header = ({ isSidebarOpen, setSidebarOpen }) => {
     setSearchValue(event.target.value);
     if (event.target.value.trim() === '') {
       navigate('/dashboard')
-      searchDispatch(addSearchResult([]));
     }
   }
     const handleKeyPress = (event) => {

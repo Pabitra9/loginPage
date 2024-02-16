@@ -4,13 +4,9 @@ import { storage } from "./firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { HiPlus } from "react-icons/hi";
-import { CiImport } from "react-icons/ci";
-import { readExcelFile } from '../Components/ReadExcelFileToImport';
+import { HiPlus, HiX } from "react-icons/hi";
 import CollectionData from '.././Collection.json'
 import { useEffect, useState } from "react";
-
-// import {collectionData} from "../Collection.json"
 
 function EditUser() {
   const { id } = useParams();
@@ -22,9 +18,17 @@ function EditUser() {
   const [previewImage, setPreviewImage] = useState(null);
   const [previewIDImage, setPreviewIDImage] = useState(null);
   const [newIdProofFile, setNewIdProofFile] = useState(null);
-
-  const [excelFile , setExcelFile] = useState ("")
   const statusOptions = ['Initial fill up', 'In Progress', 'Completed'];
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleIdProofClick = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
 
   function generateRandomId() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -65,8 +69,6 @@ function EditUser() {
     // handleMigrateCollection();
   };
     
-  // useEffect(() => {
-  // }, []);
   
   const handleStatusChange = (e) => {
     e.preventDefault();
@@ -80,6 +82,7 @@ function EditUser() {
   const handleIdProofFileChange = (e) => {
     e.preventDefault();
     setNewIdProofFile(e.target.files[0]);
+
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreviewIDImage(reader.result);
@@ -91,10 +94,10 @@ function EditUser() {
   };
 
 
-  const updateIdProof = async (e) => {
-    e.preventDefault();
+  const updateIdProof = async () => {
     try {
-      if (newIdProofFile) {
+      //if (newIdProofFile) {
+        setLoading(true)
         const newIdProofStorageRef = ref(storage, `idCopy/${newIdProofFile.name}`);
         await uploadBytes(newIdProofStorageRef, newIdProofFile);
         const newIdProofUrl = await getDownloadURL(newIdProofStorageRef);
@@ -105,15 +108,17 @@ function EditUser() {
           idProof: newIdProofUrl,
         };
         console.log(updatedData);
-        await updateDoc(doc(db, "Database", id), updatedData);
+        await setDoc(doc(db, "Database", id), updatedData);
         setCurrentDataFromFirebase(updatedData);
-        console.log(updatedData);
+        console.log(newIdProofUrl);
+        setLoading(false)
         // alert("Successfully Updated");
         // navigate("/dashboard");  
-      } else {
-        alert("You dont choose anything Update")  
-      }
+      //} else {
+        //alert("You dont choose anything Update")  
+      //}
     } catch (error) {
+      setLoading(false)
       console.error("Error updating ID proof:", error);
       alert("Error updating ID proof");
     }
@@ -151,6 +156,7 @@ function EditUser() {
   };
 
   newProfilePhoto && console.log(newProfilePhoto);
+  newIdProofFile && console.log(newIdProofFile);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -165,7 +171,8 @@ function EditUser() {
       if (newProfilePhoto ) {
         await updateProfilePhoto();
       }
-      if (newIdProofFile) {
+      console.log(newIdProofFile);
+      if (newIdProofFile ) {
         await updateIdProof();
       }
 
@@ -186,9 +193,9 @@ function EditUser() {
   };
   const updateProfilePhoto = async () => {
     try {
+      setLoading(true)
       const storageRef = ref(storage, `image/${newProfilePhoto?.name}`); // Adjust the path as needed
       // console.log(storageRef);
-    
       await uploadBytes(storageRef, newProfilePhoto); // Upload the new profile photo
       const downloadNewProfileUrl = await getDownloadURL(storageRef);
       const updatedData = {
@@ -204,9 +211,11 @@ function EditUser() {
       console.log(downloadNewProfileUrl);
       
       // console.log(newProfilePhoto);
+      setLoading(false)
     
     } catch (error) {
       console.error("Error updating profile photo:", error);
+      setLoading(false)
     }
   };
   // console.log(id);
@@ -215,12 +224,12 @@ function EditUser() {
     <div className="h-screen w-screen flex items-center rounded-md shadow-md overflow-hidden">
        {/* <h1 className="text-2xl font-bold mb-4">Edit User Data</h1> */}
       <div className="w-1/3 h-full  bg-[#2960A1] rounded-s-md shadow-lg">
-        <div className="flex items-center justify-center m-8 ">
+        <div className="flex items-center justify-center m-5 ">
           {previewImage ? (<img src={previewImage} alt="User" className="w-48 h-48 rounded-full border-solid border-[#8DC162] border-4 object-cover" />) : (<img src={currentDataFromFirebase.image } alt="User" className="w-48 h-48 rounded-full border-solid border-[#8DC162] border-4 object-cover" />)}
         {/* {console.log(currentDataFromFirebase.image)} */}
         
        </div>
-       <div className="flex items-center justify-center m-8 bg-white p-2 gap-1" >
+       <div className="flex items-center justify-center m-8 mt-0 mb-2 bg-white p-2 gap-1 " >
        <label htmlFor="profilePhotoInput" className="cursor-pointer">
             Edit Photo
             <input
@@ -232,10 +241,10 @@ function EditUser() {
               onChange={handleFileChange}
             />
           </label>
-        <HiPlus className="text-lg" onClick={updateProfilePhoto}/>
+        <HiPlus className="text-lg"/>
        </div>
         <div className="">
-        <div className="flex flex-wrap gap-4 p-10">
+        <div className="flex flex-wrap gap-4 p-10 pt-0 pb-2">
                     <div className="w-full">
                       <label className="mb-2 text-white font-semibold ">Email</label>
                       <input type="text" name="email" className="w-full mb-2 border-b-2 text-white border-white bg-transparent outline-none" value={currentDataFromFirebase.email} onChange={(e) => setCurrentDataFromFirebase({...currentDataFromFirebase, email: e.target.value })}/>
@@ -250,44 +259,40 @@ function EditUser() {
                     </div>
                   </div>  
               </div>
-                   <div className="flex justify-center items-center flex-col">
-                        <div className="w-72 h-20 border-2 border-solid border-white rounded-md">
-                            {/* <HiDocument className="w-32 h-20"/> */}
-                            {/* <input
-                              type="file"
-                              accept=".pdf"
-                              onChange={handleIdProofFileChange}
-                            /> */}
-
-                            {/* Display the existing ID proof */}
-                            {/* <img src={currentDataFromFirebase?.idProof} alt="ID Proof" style={{ maxWidth: '100%' }} /> */}
-
-                  {/* Input field for selecting a new ID proof file */}
-                 
-
-                  {/* Display the preview of the new ID proof file */}
+                   <div className="flex justify-center items-center flex-col ">
+                        <div className="w-72 h-32 border-2 border-solid border-white rounded-md overflow-hidden ">
                 {previewIDImage ? (
-                <img src={previewIDImage} alt="New ID Proof Preview" className="w-48 h-48 object-cover" />
-                ):(<img src={currentDataFromFirebase.idProof} alt="ID Proof" className="w-48 h-48  object-cover" />)}
-
-                {/* Button to update the ID proof */}
-              {/* <button
-              type="submit"
-              className=" bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium"
-              onClick={updateIdProof}
-              >
-              Update ID Proof
-              </button> */}
+                <img src={previewIDImage} alt="New ID Proof Preview" className="w-full h-full object-cover overflow-hidden cursor-pointer"  onClick={handleIdProofClick} />
+                ):(<img src={currentDataFromFirebase.idProof} alt="ID Proof" className="w-full h-full  object-cover overflow-hidden cursor-pointer"  onClick={handleIdProofClick}/>)}
+                {showModal && (
+                <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+                <div className="bg-white p-4 rounded-md">
+                <img
+                src={previewIDImage || currentDataFromFirebase.idProof}
+                alt="ID Proof"
+                className="w-full h-full object-cover "
+                />
+              <button className="absolute top-4 right-4 text-white font-semibold flex justify-center items-center gap-2 text-lg bg-red-500 p-2 rounded-md" onClick={closeModal}>
+              Close <HiX/>
+            </button>
+          </div>
+        </div>
+      )}               
                         </div>
-                    {/* <p>{currentDataFromFirebase.idProof}</p> */}
-                    {/* {console.log({currentDataFromFirebase.idProof})}; */}
+                    <div className="flex items-center justify-center m-8 mt-6 bg-white p-2 gap-1 " >
+                    <label htmlFor="idProofInput" className="cursor-pointer">
+                      Edit IdPoof
                     <input
+                    id="idProofInput"
+                    name="idProof"
                   type="file"
                   accept=".jpg,.png,image/*"
                   onChange={handleIdProofFileChange}
-                  className=""
+                  className="hidden"
                   />
-
+                  </label>
+                  <HiPlus className="text-lg"/>
+                  </div>
                    </div>
             </div>
       <div className="w-full h-full overflow-y-scroll bg-gray-100 rounded-e-md shadow-md">
@@ -389,7 +394,7 @@ function EditUser() {
               <input type="text" name="howFound" className="w-full mb-2 mt-2 border-b-2 outline-none bg-transparent" value={currentDataFromFirebase.howFound} onChange={(e) => setCurrentDataFromFirebase({...currentDataFromFirebase, howFound: e.target.value })} />
             </div>
         </div>
-            <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleSubmit}>Update</button>
+            <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleSubmit} disabled={loading}>{loading ? "Updating..." : "Update"}</button>
             {/* <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleMigrateCollection}>Upload</button> */}
           </div>
         </div>
