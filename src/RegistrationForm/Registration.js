@@ -336,6 +336,7 @@ const handlePostRequest = async () => {
           // Add any other headers as needed
         },
         body: JSON.stringify(storedData),
+        mode: "no-cors"
       });
 
       if (!response.ok) {
