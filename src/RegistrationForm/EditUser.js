@@ -14,6 +14,7 @@ function EditUser() {
 
   const [currentDataFromFirebase, setCurrentDataFromFirebase] = useState({});
   const [data, setData] = useState([])
+  const [originalData, setOriginalData] = useState({});
   const [newProfilePhoto, setNewProfilePhoto] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [previewIDImage, setPreviewIDImage] = useState(null);
@@ -132,6 +133,7 @@ function EditUser() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setCurrentDataFromFirebase(docSnap.data());
+          setOriginalData(docSnap.data())
         }
       } catch (error) {
         console.log(error);
@@ -162,6 +164,13 @@ function EditUser() {
     e.preventDefault();
     const updatedData = currentDataFromFirebase;
     console.log(updatedData);
+
+    const isDataChanged = JSON.stringify(currentDataFromFirebase) !== JSON.stringify(originalData);
+
+    if (!isDataChanged) {
+      alert('Nothing has changed to update.');
+      return;
+    }
 
     try {
       // Update the document in the Firestore database.

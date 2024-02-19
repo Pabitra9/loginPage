@@ -265,6 +265,7 @@ function Registration() {
   const [isDataStored, setIsDataStored] = useState(false);
   const [fileSizeErrorForImageUpload, setFileSizeErrorForImageUpload] = useState(null);
   const [fileSizeErrorForIdProof, setFileSizeErrorForIdProof] = useState(null);
+  const [storedData, setStoredData] = useState({})
 
   const handleCountryChange = (event) => {
     setSelectedCountry(event.target.value);
@@ -325,6 +326,30 @@ console.log(errors);
     const fileSizeKB = file.size / 1024;
     return fileSizeKB >= minSizeKB && fileSizeKB <= maxSizeKB;
 }
+
+const handlePostRequest = async () => {
+    try {
+      const response = await fetch('https://academy.chrmp.com/wp-json/autonami/v1/webhook/?bwfan_autonami_webhook_id=109&bwfan_autonami_webhook_key=095304dbd098fd805e5265470506365f', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any other headers as needed
+        },
+        body: JSON.stringify(storedData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Handle the response data, if needed
+      const responseData = await response.json();
+      console.log('Response data:', responseData);
+    } catch (error) {
+      console.error('Error during POST request:', error);
+    }
+  };
+  
   
   const handleSubmitData = async(e) => {
       e.preventDefault ();
@@ -357,10 +382,12 @@ console.log(errors);
                 console.log("image b hela");
                 
                 try{ 
-                    const res = await addDoc(usersData, {name:name.toLocaleLowerCase(),dob:dob,email:email,phone:phone,alternativePhone:alternativePhone,gender:gender, streetAddress:streetAddress, addressLine2:addressLine2,city:city,state:state,zipcode:zipcode,country:selectedCountry, certificationProgram:certificationProgram,  registrationDate:registrationDate, education:education, totalExperience:totalExperience, hrExperience:hrExperience, prevOrg:prevOrg,currentOrg,designation:designation,linkedin:linkedin, howFound:howFound,certificationNumber:certificationNumber, image:downloadProfileUrl , idProof:downloadIdDocumentUrl})
-                    
-                    if(res){
+                    const res = await addDoc(usersData, {name:name.toLocaleLowerCase(),dob:dob,email:email,phone:phone,alternativePhone:alternativePhone,gender:gender, streetAddress:streetAddress, addressLine2:addressLine2,city:city,state:state,zipcode:zipcode,country:selectedCountry, certificationProgram:certificationProgram,  registrationDate:registrationDate, education:education, totalExperience:totalExperience, hrExperience:hrExperience, prevOrg:prevOrg,currentOrg,designation:designation,linkedin:linkedin, howFound:howFound,certificationNumber:certificationNumber, image:downloadProfileUrl , idProof:downloadIdDocumentUrl , status : "Initial fill up"})
 
+                    setStoredData(res)
+                    if(res){
+                        
+                        handlePostRequest()
                         navigate('/thankyouPage')
                     }
             
