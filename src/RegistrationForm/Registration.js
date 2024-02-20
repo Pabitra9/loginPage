@@ -329,7 +329,7 @@ console.log(errors);
 
 const handlePostRequest = async () => {
     try {
-      const response = await fetch('https://academy.chrmp.com/wp-json/autonami/v1/webhook/?bwfan_autonami_webhook_id=109&bwfan_autonami_webhook_key=095304dbd098fd805e5265470506365f', {
+      const response = await fetch('https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjUwNTY4MDYzMDA0MzI1MjZlNTUzYzUxMzci_pc', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
