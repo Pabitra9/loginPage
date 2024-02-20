@@ -150,10 +150,13 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
       </div>
       {/* <div className="flex pl-10 items-center gap-1 p-3"> */}
           {/* <Link to={'/login'}> */}
-        <div className="flex items-center justify-center gap-2 p-3 m-1 bg-[#ffffff] hover:bg-[#E41B17] hover:text-white transition-all ease-out rounded-md mt-auto cursor-pointer text-blue-900" onClick={handleLogOut}>
-            <HiOutlineLogout className="text-lg font-extrabold" />
-            <span className='font-bold text-sm'>Log Out</span>
-        </div>
+          <div 
+  className="flex items-center justify-center gap-2 p-3 m-1 bg-[#ffffff] hover:bg-[#E41B17] hover:text-white transition-all ease-out rounded-md mt-auto cursor-pointer text-blue-900" 
+  onClick={handleLogOut}
+  >
+  <HiOutlineLogout className="text-lg font-extrabold" />
+  <span className='font-bold text-sm'>Log Out</span>
+  </div>
           {/* </Link> */}
       {/* </div> */}
     </div>

@@ -69,8 +69,8 @@ const Tabulator = () => {
         setIsLoading(true)
         const queryData = query(
           collection(db, 'Database'),
-          orderBy('name'),
-          //orderBy('timestamp', 'desc'), 
+          //orderBy('registrationDate', 'desc'),
+          orderBy('name'), 
           startAfter(lastVisible),
           limit(itemsPerPage)
         );
@@ -98,11 +98,12 @@ const Tabulator = () => {
         const fetchedData = documentSnapshots.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-          
         }));
+        // console.log(fetchData());
   
         // Combine the current data with the new data
         setData((prevData) =>(lastVisible ? [...prevData, ...fetchedData] : fetchedData));
+        console.log(data);
         setLastVisible(lastVisibleDocument);
         setIsLoading(false)
       } catch (error) {

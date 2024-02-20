@@ -373,7 +373,7 @@ const handlePostRequest = async () => {
         console.log(downloadProfileUrl);
         console.log(downloadIdDocumentUrl);
         
-        if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound && imageUpload && idproof ){
+        // if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound && imageUpload && idproof ){
 
             
             setIsDataStored(true) 
@@ -400,7 +400,7 @@ const handlePostRequest = async () => {
                 console.error('Error adding document:', error);      
             } 
             }
-        }else{
+        else{
             setIsDataStored(false)
             alert("please fill up all the feilds")
         }
