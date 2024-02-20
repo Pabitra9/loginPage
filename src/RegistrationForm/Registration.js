@@ -336,12 +336,12 @@ const handlePostRequest = async () => {
           // Add any other headers as needed
         },
         body: JSON.stringify(storedData),
-        mode: "no-cors"
+        //mode: "no-cors"
       });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+    //   if (!response.ok) {
+    //     throw new Error('Network response was not ok');
+    //   }
 
       // Handle the response data, if needed
       const responseData = await response.json();
