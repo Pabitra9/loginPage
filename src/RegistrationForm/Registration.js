@@ -2,7 +2,7 @@ import React from "react";
 import Country from './Countries'
 import { useState, useEffect } from "react";
 import { db } from "./firebase";
-import {collection,addDoc} from 'firebase/firestore'
+import {collection,addDoc , serverTimestamp} from 'firebase/firestore'
 import { storage } from "./firebase";
 import { ref , uploadBytes, getDownloadURL, } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
@@ -383,7 +383,7 @@ const handlePostRequest = async () => {
                 console.log("image b hela");
                 
                 try{ 
-                    const res = await addDoc(usersData, {name:name.toLocaleLowerCase(),dob:dob,email:email,phone:phone,alternativePhone:alternativePhone,gender:gender, streetAddress:streetAddress, addressLine2:addressLine2,city:city,state:state,zipcode:zipcode,country:selectedCountry, certificationProgram:certificationProgram,  registrationDate:registrationDate, education:education, totalExperience:totalExperience, hrExperience:hrExperience, prevOrg:prevOrg,currentOrg,designation:designation,linkedin:linkedin, howFound:howFound,certificationNumber:certificationNumber, image:downloadProfileUrl , idProof:downloadIdDocumentUrl , status : "Initial fill up"})
+                    const res = await addDoc(usersData, {name:name.toLocaleLowerCase(),dob:dob,email:email,phone:phone,alternativePhone:alternativePhone,gender:gender, streetAddress:streetAddress, addressLine2:addressLine2,city:city,state:state,zipcode:zipcode,country:selectedCountry, certificationProgram:certificationProgram,  registrationDate:registrationDate, education:education, totalExperience:totalExperience, hrExperience:hrExperience, prevOrg:prevOrg,currentOrg,designation:designation,linkedin:linkedin, howFound:howFound,certificationNumber:certificationNumber, image:downloadProfileUrl , idProof:downloadIdDocumentUrl , status : "Initial fill up" , timestamp: serverTimestamp()})
 
                     setStoredData(res)
                     if(res){

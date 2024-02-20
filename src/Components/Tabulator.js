@@ -70,6 +70,7 @@ const Tabulator = () => {
         const queryData = query(
           collection(db, 'Database'),
           orderBy('name'),
+          //orderBy('timestamp', 'desc'), 
           startAfter(lastVisible),
           limit(itemsPerPage)
         );
