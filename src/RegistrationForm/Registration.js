@@ -368,13 +368,15 @@ const handlePostRequest = async () => {
         console.log(e);
 
         const {name,dob,email,phone,alternativePhone,gender, streetAddress,  addressLine2,  city, state,  zipcode, certificationProgram,  registrationDate, education, totalExperience, hrExperience, prevOrg,
-        currentOrg,designation,  linkedin, howFound,certificationNumber } = values
+        currentOrg,designation,  linkedin, howFound, certificationNumber } = values
 
         console.log(downloadProfileUrl);
         console.log(downloadIdDocumentUrl);
+       // console.log(name);
         
-         if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound && imageUpload && idproof ){
-
+        if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound && imageUpload && idproof ){
+             console.log(values);
+            console.log(name)
             
             setIsDataStored(true) 
             console.log("hauchi");

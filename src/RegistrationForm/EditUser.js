@@ -1,4 +1,5 @@
 import { db } from "./firebase";
+import { Timestamp } from "firebase/firestore";
 import { doc, getDoc, setDoc, updateDoc, collection } from 'firebase/firestore';
 import { storage } from "./firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -7,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { HiPlus, HiX } from "react-icons/hi";
 import CollectionData from '.././Collection.json'
 import { useEffect, useState } from "react";
+
 
 function EditUser() {
   const { id } = useParams();
@@ -44,6 +46,17 @@ function EditUser() {
     return randomId;
   }
 
+  async function convertDateToFirestoreTimestamp(dateString) {
+    // Parse the date string into a Date object
+    const date = new Date(dateString);
+
+    // Use Firestore Timestamp.fromDate() method to convert it
+    return Timestamp.fromDate(date);
+}
+// for creating timestamp in firebase , check wheather timestamp is there or not while importing
+
+
+
 
     const handleMigrateCollection = () =>{
     const yourCollection = collection(db,'Database');
@@ -53,9 +66,15 @@ function EditUser() {
     const allDocumentsData = CollectionData
 
     // Add all documents to the collection
-    allDocumentsData.forEach((docData, index) => {
+    allDocumentsData.forEach(async (docData, index) => {
       const randomId = generateRandomId();
       const documentRef = doc(yourCollection, randomId);
+
+      const dateString = docData.timestamp;
+      const firestoreTimestamp = await convertDateToFirestoreTimestamp(dateString);
+      console.log(firestoreTimestamp);
+
+      docData.timestamp =  firestoreTimestamp;
   
       setDoc(documentRef, docData)
         .then(() => {
@@ -69,7 +88,11 @@ function EditUser() {
     navigate('/dashboard')
     // handleMigrateCollection();
   };
-    
+
+
+
+
+
   
   const handleStatusChange = (e) => {
     e.preventDefault();
@@ -166,12 +189,14 @@ function EditUser() {
     console.log(updatedData);
 
     const isDataChanged = JSON.stringify(currentDataFromFirebase) !== JSON.stringify(originalData);
-
-    if (!isDataChanged) {
+    const isIdProofChanged = newIdProofFile !== null;
+    const isProfilePhotoChanged = newProfilePhoto !== null;
+    
+    if (!isDataChanged && !isProfilePhotoChanged && !isIdProofChanged) {
       alert('Nothing has changed to update.');
       return;
     }
-
+    
     try {
       // Update the document in the Firestore database.
       const updateDocResponse = await updateDoc(doc(db, "Database", id), updatedData);
@@ -184,12 +209,12 @@ function EditUser() {
       if (newIdProofFile ) {
         await updateIdProof();
       }
-
+      
       if (currentDataFromFirebase.status !== currentDataFromFirebase.statusInFirestore) {
         const itemDocRef = doc(db, 'Database', id);
         await updateDoc(itemDocRef, { status: currentDataFromFirebase.status });
       }
-
+      
       alert('Successfully Updated')
       navigate('/dashboard')
     } catch (error) {

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { HiOutlineArchive, HiPencilAlt, HiOutlineInformationCircle } from 'react-icons/hi';
 import { useLocation } from 'react-router-dom';
 import { db } from '../RegistrationForm/firebase';
-import { getDocs, collection, deleteDoc, doc ,query,limit,orderBy,startAfter, getCountFromServer} from 'firebase/firestore';
+import { getDocs, collection, deleteDoc, doc ,query,limit,orderBy,startAfter, getCountFromServer, endBefore, endAt} from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 
 // const ITEMS_PER_PAGE = 10;
@@ -67,13 +67,21 @@ const Tabulator = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const queryData = query(
-          collection(db, 'Database'),
-          //orderBy('registrationDate', 'desc'),
-          orderBy('name'), 
-          startAfter(lastVisible),
-          limit(itemsPerPage)
-        );
+        let queryData;
+        if (lastVisible) {
+          queryData = query(
+            collection(db, 'Database'),
+            orderBy('timestamp', 'desc'),
+            startAfter(lastVisible),
+            limit(10)
+          );
+        } else {
+          queryData = query(
+            collection(db, 'Database'),
+            orderBy('timestamp', 'desc'),
+            limit(10)
+          );
+        }
 
         let totalCountSnapshot;
            totalCountSnapshot = await getCountFromServer(collection(db, 'Database'));
@@ -84,6 +92,7 @@ const Tabulator = () => {
           setTotalNoOfPagecount(totalPages);
          
         const documentSnapshots = await getDocs(queryData);
+        console.log(documentSnapshots);
   
         if (documentSnapshots.empty) {
           // No more data to fetch
