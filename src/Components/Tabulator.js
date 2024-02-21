@@ -179,6 +179,7 @@ const Tabulator = () => {
       {/* <h1 className="text-2xl font-bold mb-4">Data Table</h1> */}
       </div>  
         {/* <h1 className="text-2xl font-bold mb-4">User Role : {currentUserRole}</h1> */}
+        <div className="overflow-x-auto max-w-full">
       <table className="min-w-full bg-white rounded-lg shadow-lg">
         <thead>
           <tr>
@@ -285,7 +286,7 @@ const Tabulator = () => {
 
         </tbody>
       </table>
-
+      </div>
       {isLoading && (
         <div className="flex items-center justify-center mt-4">
           <p className="text-gray-500">Loading...</p>

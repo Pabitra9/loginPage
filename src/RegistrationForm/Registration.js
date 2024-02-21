@@ -326,22 +326,20 @@ console.log(errors);
     const fileSizeKB = file.size / 1024;
     return fileSizeKB >= minSizeKB && fileSizeKB <= maxSizeKB;
 }
-
-const handlePostRequest = async () => {
+const pabblyWebhookUrl = 'https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjUwNTY4MDYzMDA0MzI1MjZlNTUzYzUxMzci_pc';
+const handlePostRequest = async (data) => {
     try {
-      const response = await fetch('https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjUwNTY4MDYzMDA0MzI1MjZlNTUzYzUxMzci_pc', {
+      const response = await fetch(pabblyWebhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Add any other headers as needed
         },
-        body: JSON.stringify(storedData),
-        //mode: "no-cors"
+        body: JSON.stringify(data),
       });
 
-    //   if (!response.ok) {
-    //     throw new Error('Network response was not ok');
-    //   }
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
       // Handle the response data, if needed
       const responseData = await response.json();
@@ -350,6 +348,8 @@ const handlePostRequest = async () => {
       console.error('Error during POST request:', error);
     }
   };
+
+
   
   
   const handleSubmitData = async(e) => {
@@ -368,30 +368,30 @@ const handlePostRequest = async () => {
         console.log(e);
 
         const {name,dob,email,phone,alternativePhone,gender, streetAddress,  addressLine2,  city, state,  zipcode, certificationProgram,  registrationDate, education, totalExperience, hrExperience, prevOrg,
-        currentOrg,designation,  linkedin, howFound, certificationNumber } = values
+        currentOrg,designation,  linkedin, howFound,certificationNumber } = values
 
         console.log(downloadProfileUrl);
         console.log(downloadIdDocumentUrl);
-       // console.log(name);
         
-        if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound && imageUpload && idproof ){
-             console.log(values);
-            console.log(name)
+         if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound && imageUpload && idproof ){
+
             
             setIsDataStored(true) 
             console.log("hauchi");
 
             if (downloadProfileUrl && downloadIdDocumentUrl) {
                 console.log("image b hela");
+
+                const actualData = {name:name.toLocaleLowerCase(),dob:dob,email:email,phone:phone,alternativePhone:alternativePhone,gender:gender, streetAddress:streetAddress, addressLine2:addressLine2,city:city,state:state,zipcode:zipcode,country:selectedCountry, certificationProgram:certificationProgram,  registrationDate:registrationDate, education:education, totalExperience:totalExperience, hrExperience:hrExperience, prevOrg:prevOrg,currentOrg,designation:designation,linkedin:linkedin, howFound:howFound,certificationNumber:certificationNumber, image:downloadProfileUrl , idProof:downloadIdDocumentUrl , status : "Initial fill up" , timestamp: serverTimestamp()}
                 
                 try{ 
-                    const res = await addDoc(usersData, {name:name.toLocaleLowerCase(),dob:dob,email:email,phone:phone,alternativePhone:alternativePhone,gender:gender, streetAddress:streetAddress, addressLine2:addressLine2,city:city,state:state,zipcode:zipcode,country:selectedCountry, certificationProgram:certificationProgram,  registrationDate:registrationDate, education:education, totalExperience:totalExperience, hrExperience:hrExperience, prevOrg:prevOrg,currentOrg,designation:designation,linkedin:linkedin, howFound:howFound,certificationNumber:certificationNumber, image:downloadProfileUrl , idProof:downloadIdDocumentUrl , status : "Initial fill up" , timestamp: serverTimestamp()})
+                    const res = await addDoc(usersData, actualData);
 
                     setStoredData(res)
                     if(res){
-                        
-                        handlePostRequest()
-                        navigate('/thankyouPage')
+                        console.log(actualData);
+                        handlePostRequest(actualData);
+                        navigate('/thankyouPage');
                     }
             
                 console.log(res)
@@ -408,6 +408,13 @@ const handlePostRequest = async () => {
         }
             
           }
+
+          useEffect(() => {
+              console.log(storedData);
+          }, [storedData])
+          
+
+
 
   return (
     <div className="font-roboto bg-gray-100 p-4">

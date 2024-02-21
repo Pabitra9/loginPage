@@ -127,15 +127,18 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
           </Link>
 
           {/* <Link to={'/menu1'}> */}
-          <button className={`flex pl-10 items-center gap-2 p-3 m-1 ${highlight ? 'bg-slate-400 rounded-md' : 'hover:bg-slate-400 hover:rounded-md'}`}
-         onClick={() => {
-        fetchDataToExport();
-        setHighlight(true);
-      }}>
-            <CiExport className="text-lg" /> 
-           <span>
-            Export Data
-          </span> 
+          <button
+          className={`flex pl-10 items-center gap-2 p-3 m-1 ${
+            highlight
+              ? 'bg-slate-400 rounded-md'
+              : 'hover:bg-slate-400 hover:rounded-md'
+          }`}
+          onClick={() => {
+            fetchDataToExport();
+          }}
+        >
+          <CiExport className="text-lg" />
+          <span>Export Data</span>
         </button>
           {/* </Link> */}
 
