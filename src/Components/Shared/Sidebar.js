@@ -108,7 +108,7 @@ const Sidebar = ({isSidebarOpen, setSidebarOpen}) => {
         <div className='flex items-center justify-start my-8 pb-2 gap-4 border-b'>
             {/* <img src={profilePic} className='w-10 cursor-pointer'/> */}
             {userDisplayName && (
-          <div className='w-14 h-12 rounded-[100%] bg-[#8dc14e] flex items-center justify-center'>
+          <div className='w-12 h-12 rounded-[100%] bg-[#8dc14e] flex items-center justify-center'>
             <span className='text-white text-lg font-semibold'>{userDisplayName.charAt(0)}</span>
           </div>
         )}
