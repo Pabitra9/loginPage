@@ -266,6 +266,7 @@ function Registration() {
   const [fileSizeErrorForImageUpload, setFileSizeErrorForImageUpload] = useState(null);
   const [fileSizeErrorForIdProof, setFileSizeErrorForIdProof] = useState(null);
   const [storedData, setStoredData] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCountryChange = (event) => {
     setSelectedCountry(event.target.value);
@@ -357,6 +358,7 @@ const handlePostRequest = async (data) => {
       handleSubmit();
     //   setIsDataStored(true)
       // uploadImage()
+      setIsSubmitting(true);
                   const imgRef = ref(storage,`image/${imageUpload?.name}`)
                   await uploadBytes(imgRef,imageUpload)
                   const idRef = ref(storage,`idCopy/${idproof?.name}`)
@@ -676,7 +678,7 @@ const handlePostRequest = async (data) => {
     
                 {/* <!-- Submit Button --> */}
                 <div className="mt-6">
-                    <button type="submit" className="bg-[#2960a1] hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out" onClick={handleSubmitData}>Submit</button>
+                    <button type="submit" className="bg-[#2960a1] hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out" onClick={handleSubmitData} disabled={isSubmitting} >{isSubmitting ? 'Submitting...' : 'Submit'}</button>
                 </div>
                 
             </form>)}
