@@ -229,7 +229,7 @@ const Tabulator = () => {
             </div>
           </button>
         </Link> */}
-        <Link to={`/edit/${item.id}`}>
+        <Link to={`/edit/${result.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">
             <div className='flex justify-evenly items-center'>
               <HiPencilAlt className='text-lg text-blue-700' />
