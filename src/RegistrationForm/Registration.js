@@ -407,6 +407,7 @@ const handlePostRequest = async (data) => {
         }else{
             setIsDataStored(false)
             alert("please fill up all the feilds")
+            setIsSubmitting(false)
         }
             
           }
