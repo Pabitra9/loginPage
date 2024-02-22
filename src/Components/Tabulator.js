@@ -203,7 +203,7 @@ const Tabulator = () => {
     {result.status}
   </td>
       <td className="px-4 py-2 text-center">
-         {currentUserRole == 'tech'? (
+         {currentUserRole == 'tech' || 'admin'? (
           <>
           <Link to={`/edit/${result.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">
@@ -221,11 +221,19 @@ const Tabulator = () => {
         </>
          ) : (
          <>
-         <Link to={`/showAllData/${result.id}`}>
+         {/* <Link to={`/showAllData/${result.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">
             <div className='flex justify-evenly items-center'>
               <HiOutlineInformationCircle className='text-lg text-blue-700' />
               <span>Info</span>
+            </div>
+          </button>
+        </Link> */}
+        <Link to={`/edit/${item.id}`}>
+          <button className="text-black py-2 px-3 rounded mr-2">
+            <div className='flex justify-evenly items-center'>
+              <HiPencilAlt className='text-lg text-blue-700' />
+              <span>Edit</span>
             </div>
           </button>
         </Link>
@@ -245,7 +253,7 @@ const Tabulator = () => {
         {item.status}
     </td>
       <td className="px-4 py-2 text-center">
-      {currentUserRole == 'tech'? (
+      {currentUserRole == 'tech' || 'admin'? (
           <>
           <Link to={`/edit/${item.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">
@@ -263,11 +271,19 @@ const Tabulator = () => {
         </>
          ) : (
          <>
-         <Link to={`/showAllData/${item.id}`}>
+         {/* <Link to={`/showAllData/${item.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">
             <div className='flex justify-evenly items-center'>
               <HiOutlineInformationCircle className='text-lg text-blue-700' />
               <span>Info</span>
+            </div>
+          </button>
+        </Link> */}
+        <Link to={`/edit/${item.id}`}>
+          <button className="text-black py-2 px-3 rounded mr-2">
+            <div className='flex justify-evenly items-center'>
+              <HiPencilAlt className='text-lg text-blue-700' />
+              <span>Edit</span>
             </div>
           </button>
         </Link>
