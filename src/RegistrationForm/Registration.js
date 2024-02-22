@@ -307,7 +307,7 @@ function Registration() {
     validationSchema : singUpSchema,
     onSubmit : (values,action) => {
         console.log(values);
-        action.resetForm()
+        //action.resetForm()
     }
 
 })
