@@ -303,7 +303,7 @@ function Registration() {
   }
 //   console.log(initialValues);
 
-  const {values, errors, handleChange , handleBlur , handleSubmit, touched} = useFormik({
+  const {values, errors, handleChange , handleBlur , handleSubmit, touched } = useFormik({
     initialValues : initialValues,
     validationSchema : singUpSchema,
     onSubmit : (values,action) => {
@@ -370,12 +370,12 @@ const handlePostRequest = async (data) => {
         console.log(e);
 
         const {name,dob,email,phone,alternativePhone,gender, streetAddress,  addressLine2,  city, state,  zipcode, certificationProgram,  registrationDate, education, totalExperience, hrExperience, prevOrg,
-        currentOrg,designation,  linkedin, howFound,certificationNumber } = values
+        currentOrg,designation,  linkedin, howFound, certificationNumber } = values
 
         console.log(downloadProfileUrl);
         console.log(downloadIdDocumentUrl);
         
-         if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound && imageUpload && idproof ){
+         if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound){
 
             
             setIsDataStored(true) 
@@ -633,7 +633,7 @@ const handlePostRequest = async (data) => {
                         
                         // value={imageUpload?toString(imageUpload.name):""}
                         
-                        onChange={(e)=>{
+                        onChange={async(e)=>{
                             e.preventDefault();
                             const file = e.target.files[0];
                             if (file && validateFileSize(file, 20, 300)) {
@@ -685,9 +685,6 @@ const handlePostRequest = async (data) => {
                 
             </form>)}
         </div>
-    
-
-
     </div>
   );
 }
