@@ -401,6 +401,7 @@ const handlePostRequest = async (data) => {
     
              catch (error) {
                 setIsDataStored(false)
+                setIsSubmitting(false)
                 console.error('Error adding document:', error);      
             } 
             }
