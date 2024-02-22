@@ -178,7 +178,7 @@ const Tabulator = () => {
     <div className='flex justify-between'>
       {/* <h1 className="text-2xl font-bold mb-4">Data Table</h1> */}
       </div>  
-        {/* <h1 className="text-2xl font-bold mb-4">User Role : {currentUserRole}</h1> */}
+        <h1 className="text-2xl font-bold mb-4">User Role : {currentUserRole}</h1>
         <div className="overflow-x-auto max-w-full">
       <table className="min-w-full bg-white rounded-lg shadow-lg">
         <thead>
@@ -203,7 +203,7 @@ const Tabulator = () => {
     {result.status}
   </td>
       <td className="px-4 py-2 text-center">
-         {currentUserRole == 'tech' || 'admin'? (
+         {currentUserRole === 'tech' || currentUserRole === 'admin'? (
           <>
           <Link to={`/edit/${result.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">
@@ -253,7 +253,7 @@ const Tabulator = () => {
         {item.status}
     </td>
       <td className="px-4 py-2 text-center">
-      {currentUserRole == 'tech' || 'admin'? (
+      {currentUserRole === 'tech' || currentUserRole === 'admin'? (
           <>
           <Link to={`/edit/${item.id}`}>
           <button className="text-black py-2 px-3 rounded mr-2">
