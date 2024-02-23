@@ -6,7 +6,7 @@ export const singUpSchema = Yup.object({
     email : Yup.string().email("must be a valid email").required("Please enter your email"),
     phone : Yup.number().min(9).required("Please enter your Phone number"),
     gender : Yup.mixed().oneOf(['male', 'female', 'other','Dont Want to Say']).defined().required('Please select one of these'),
-    certificationProgram : Yup.mixed().oneOf(['CHRMP Foundation', 'HRBP Advanced', 'HR Analytics','CHRMP BEI','CHRMP Competency Mapping','CHRMP Talent Acquisition','CHRMP Talent Development','Dual (Foundation + HRA)','Dual (HRBP + HRA)','CHRMP Tableau for HR','C&B Planning','Generative AI in HR','PoSH']).defined().required('Please select one of these'),
+    certificationProgram : Yup.mixed().oneOf(['CHRMP Foundation', 'HRBP Advanced', 'HR Analytics','CHRMP BEI','CHRMP Competency Mapping','CHRMP Talent Acquisition','CHRMP Talent Development','Dual (Foundation + HRA)','Dual (HRBP + HRA)','CHRMP Tableau for HR','C&B Planning','Generative AI in HR','PoSH - Consultant','CLDP','HR Operations','Data Visualisation','PoSH - Train the Trainer','PoSH - Employees','HR Generalist','Talent Management','Certified L&D Manager','Talent Acquisition Manager']).defined().required('Please select one of these'),
     registrationDate : Yup.date().nullable().required("Please enter your Date of Registration"),
     education : Yup.string().nullable().required('Please enter your qualification'),
     totalExperience : Yup.number().nullable().required('Please enter your Total Year of Experience'),

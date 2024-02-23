@@ -540,7 +540,16 @@ const handlePostRequest = async (data) => {
                     <option value="CHRMP Tableau for HR" >CHRMP Tableau for HR</option>
                     <option value="C&B Planning" >C&B Planning</option>
                     <option value="Generative AI in HR" >Generative AI in HR</option>
-                    <option value="PoSH" >PoSH</option>
+                    <option value="PoSH - Consultant">PoSH - Consultant</option>
+                    <option value="CLDP">CLDP</option>
+                    <option value="HR Operations">HR Operations</option>
+                    <option value="Data Visualisation">Data Visualisation</option>
+                    <option value="PoSH - Train the Trainer">PoSH - Train the Trainer</option>
+                    <option value="PoSH - Employees">PoSH - Employees</option>
+                    <option value="HR Generalist">HR Generalist</option>
+                    <option value="Talent Management">Talent Management</option>
+                    <option value="Certified L&D Manager">Certified L&D Manager</option>
+                    <option value="Talent Acquisition Manager">Talent Acquisition Manager</option>
                         </select>
                         {errors.certificationProgram && touched.certificationProgram ? <p className="text-[#ff0000]">{errors.certificationProgram}</p> : null}
                     </div> 
