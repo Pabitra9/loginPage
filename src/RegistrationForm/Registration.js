@@ -375,13 +375,13 @@ const handlePostRequest = async (data) => {
         console.log(downloadProfileUrl);
         console.log(downloadIdDocumentUrl);
         
-         if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound){
+        if (downloadProfileUrl && downloadIdDocumentUrl) {
+         if( name && dob && email && phone && gender && certificationProgram && registrationDate && education && totalExperience && hrExperience && prevOrg && currentOrg && designation && linkedin && howFound && downloadProfileUrl && downloadIdDocumentUrl){
 
             
             setIsDataStored(true) 
             console.log("hauchi");
 
-            if (downloadProfileUrl && downloadIdDocumentUrl) {
                 console.log("image b hela");
 
                 const actualData = {name:name.toLocaleLowerCase(),dob:dob,email:email,phone:phone,alternativePhone:alternativePhone,gender:gender, streetAddress:streetAddress, addressLine2:addressLine2,city:city,state:state,zipcode:zipcode,country:selectedCountry, certificationProgram:certificationProgram,  registrationDate:registrationDate, education:education, totalExperience:totalExperience, hrExperience:hrExperience, prevOrg:prevOrg,currentOrg,designation:designation,linkedin:linkedin, howFound:howFound,certificationNumber:certificationNumber, image:downloadProfileUrl , idProof:downloadIdDocumentUrl , status : "Initial fill up" , timestamp: serverTimestamp()}
@@ -404,12 +404,12 @@ const handlePostRequest = async (data) => {
                 setIsSubmitting(false)
                 console.error('Error adding document:', error);      
             } 
-            }
         }else{
             setIsDataStored(false)
             alert("please fill up all the feilds")
             setIsSubmitting(false)
         }
+            }
             
           }
 
