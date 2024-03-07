@@ -11,6 +11,7 @@ import { firebaseAuth } from '../RegistrationForm/firebase';
 import { createUserWithEmailAndPassword , signInWithEmailAndPassword } from 'firebase/auth';
 import { useDispatch } from 'react-redux';
 import { addUser } from '../Redux/UserSlice';
+import { addAuthentication } from '../Redux/AuthenticationSlice';
 
 function LoginPage() {
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -76,6 +77,32 @@ function LoginPage() {
           setErrorMessage("Invalid login credentials");
       // }
   }
+ await fetch('https://academy.chrmp.com/wp-json/jwt-auth/v1/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username: inputEmail,
+      password: inputPassword,
+    }),
+  })
+    .then(async (res) => {
+      if (res.status === 200) {
+        const data = await res.json();
+        localStorage.setItem('userDatas', JSON.stringify(data));
+        userDispatch(addAuthentication(data));
+        //navigate('TabNavigator');
+        console.log("hela");
+      }
+    })
+    .catch((error) => {
+      if (error.response && error.response.data.code === '[jwt_auth] incorrect_password') {
+        console.log("hela");
+      } else {
+        console.error('Fetch Error:', error);
+      }
+    });
   };
   return (
     <div className="min-h-screen p-8 rounded-lg gap-36 shadow-lg flex md:flex-row items-center justify-center w-full bg-[#E7EBF2]">

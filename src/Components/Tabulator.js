@@ -206,7 +206,7 @@ const Tabulator = () => {
          {currentUserRole === 'tech' || currentUserRole === 'admin'? (
           <>
           <Link to={`/edit/${result.id}`}>
-          <button className="text-black py-2 px-3 rounded mr-2">
+          <button className="text-black py-2 px-3 rounded mr-2" >
             <div className='flex justify-evenly items-center'>
               <HiPencilAlt className='text-lg text-blue-700' />
               <span>Edit</span>

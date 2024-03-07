@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { HiPlus, HiX } from "react-icons/hi";
 import CollectionData from '.././Collection.json'
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addUserDataBasedOnId } from "../Redux/DataBasedOnIdSlice";
 
 
 function EditUser() {
@@ -15,7 +17,7 @@ function EditUser() {
   const navigate = useNavigate();
 
   const [currentDataFromFirebase, setCurrentDataFromFirebase] = useState({});
-  const [data, setData] = useState([])
+  const [userId, setUserId] = useState()
   const [originalData, setOriginalData] = useState({});
   const [newProfilePhoto, setNewProfilePhoto] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
@@ -24,6 +26,8 @@ function EditUser() {
   const statusOptions = ['Initial fill up', 'In Progress', 'Completed'];
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const userDispatch = useDispatch()
 
   const handleIdProofClick = () => {
     setShowModal(true);
@@ -56,7 +60,7 @@ function EditUser() {
 // for creating timestamp in firebase , check wheather timestamp is there or not while importing
 
 
-
+  
 
     const handleMigrateCollection = () =>{
     const yourCollection = collection(db,'Database');
@@ -88,10 +92,7 @@ function EditUser() {
     navigate('/dashboard')
     // handleMigrateCollection();
   };
-
-
-
-
+  
 
   
   const handleStatusChange = (e) => {
@@ -155,8 +156,9 @@ function EditUser() {
         const docRef = doc(db, "Database", id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setCurrentDataFromFirebase(docSnap.data());
+          setCurrentDataFromFirebase(docSnap?.data());
           setOriginalData(docSnap.data())
+          userDispatch(addUserDataBasedOnId(docSnap?.data()))
         }
       } catch (error) {
         console.log(error);
@@ -165,6 +167,62 @@ function EditUser() {
 
     getDatasFromFirebase();
   }, [id]);
+
+   const token = useSelector((state)=>state.authentication.userAuthentication[0].token)
+   const email_id = useSelector((state)=>state.dataBasedOnId.userDataBasedOnId[0].email)
+   console.log(email_id);
+  // console.log(token);
+  // console.log(currentDataFromFirebase.email);
+  useEffect(async ()=>{
+    if(currentDataFromFirebase.email !== null){
+    //const handleGetUserId = async () => {
+    await fetch (`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-id?email_id=${currentDataFromFirebase?.email}`,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+    .then(async (res) => {
+      if (res.status === 200) {
+        const data = await res.json();
+        console.log(data);
+        setUserId(data?.user_id)
+        //console.log(userId);
+        console.log("hela");
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+    });
+  }
+  //handleGetUserId ();
+  },[currentDataFromFirebase.email])
+
+  //console.log(userId);
+  useEffect(()=>{
+    const handleLastLogin = async () => {
+    await fetch (`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-login-status?user_id=${userId}`,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+    .then(async (res) => {
+      if (res.status === 200) {
+        const data = await res.json();
+        console.log(data);
+
+        console.log("hela");
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+    });
+  }
+  handleLastLogin();
+  },[userId])
 
   const handleFileChange = (e) => {
     e.preventDefault();
