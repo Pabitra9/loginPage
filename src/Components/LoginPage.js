@@ -90,7 +90,7 @@ function LoginPage() {
     .then(async (res) => {
       if (res.status === 200) {
         const data = await res.json();
-        localStorage.setItem('userDatas', JSON.stringify(data));
+        localStorage.setItem('userDatas', JSON.stringify(data.token));
         userDispatch(addAuthentication(data));
         //navigate('TabNavigator');
         console.log("hela");

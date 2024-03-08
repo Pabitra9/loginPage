@@ -26,6 +26,8 @@ function EditUser() {
   const statusOptions = ['Initial fill up', 'In Progress', 'Completed'];
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [lastlogin , setLastlogin] = useState(null)
+ const [ humanReadableTime , setHumanReadableTime ] = useState(null)
 
   const userDispatch = useDispatch()
 
@@ -150,79 +152,88 @@ function EditUser() {
   };
   
 
+  const userToken =JSON.parse(localStorage.getItem('userDatas'))
   useEffect(() => {
     const getDatasFromFirebase = async () => {
       try {
         const docRef = doc(db, "Database", id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setCurrentDataFromFirebase(docSnap?.data());
+          setCurrentDataFromFirebase(docSnap.data());
+          const userEmailID = docSnap.data().email
           setOriginalData(docSnap.data())
-          userDispatch(addUserDataBasedOnId(docSnap?.data()))
+          console.log(userToken);
+          // userDispatch(addUserDataBasedOnId(docSnap.data()))
+          await fetch (`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-id?email_id=${userEmailID}`,{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${userToken}`,
+            },
+          })
+            .then(async (res) => {
+              if (res.status === 200) {
+                const data = await res.json();
+                console.log(data);
+                setUserId(data?.user_id)
+                //console.log(userId);
+                console.log("hela");
+                await fetch (`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-login-status?user_id=${data?.user_id}`,{
+               method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${userToken}`,
+                },
+              })
+                .then(async (res) => {
+                  if (res.status === 200) {
+                    const data = await res.json();
+                    console.log(data);
+                    
+                    console.log("hela");
+                      var timestamp = data.last_login;
+
+                      // Convert to milliseconds by multiplying by 1000
+                      var milliseconds = timestamp * 1000;
+
+                      // Create a new Date object with the milliseconds
+                      var dateObject = new Date(milliseconds);
+
+                      // Define options for formatting the date and time
+                      var options = {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric',
+                        timeZone: 'Asia/Kolkata', // Indian timezone
+                      };
+                      // Format the date using the specified options
+                      const humanReadableTime = dateObject.toLocaleString('en-IN', options);
+                      setHumanReadableTime(humanReadableTime)
+                      setLastlogin(data.login_status)
+                      console.log(humanReadableTime);
+                  }
+                })
+                .catch((error) => {
+                  console.error(error)
+                });
+              }
+            })
+            .catch((error) => {
+              console.error(error)
+            });
         }
       } catch (error) {
         console.log(error);
       }
     }
 
+    if(userToken ) {
     getDatasFromFirebase();
-  }, [id]);
-
-   const token = useSelector((state)=>state.authentication.userAuthentication[0].token)
-   const email_id = useSelector((state)=>state.dataBasedOnId.userDataBasedOnId[0].email)
-   console.log(email_id);
-  // console.log(token);
-  // console.log(currentDataFromFirebase.email);
-  useEffect(async ()=>{
-    if(currentDataFromFirebase.email !== null){
-    //const handleGetUserId = async () => {
-    await fetch (`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-id?email_id=${currentDataFromFirebase?.email}`,{
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-    .then(async (res) => {
-      if (res.status === 200) {
-        const data = await res.json();
-        console.log(data);
-        setUserId(data?.user_id)
-        //console.log(userId);
-        console.log("hela");
-      }
-    })
-    .catch((error) => {
-      console.error(error)
-    });
-  }
-  //handleGetUserId ();
-  },[currentDataFromFirebase.email])
-
-  //console.log(userId);
-  useEffect(()=>{
-    const handleLastLogin = async () => {
-    await fetch (`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-login-status?user_id=${userId}`,{
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-    .then(async (res) => {
-      if (res.status === 200) {
-        const data = await res.json();
-        console.log(data);
-
-        console.log("hela");
-      }
-    })
-    .catch((error) => {
-      console.error(error)
-    });
-  }
-  handleLastLogin();
-  },[userId])
+    }
+  }, [id,userToken]);
 
   const handleFileChange = (e) => {
     e.preventDefault();
@@ -398,7 +409,20 @@ function EditUser() {
       value={currentDataFromFirebase.name}
       onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value.toLocaleLowerCase() })}
       />
+   <div className="flex justify-items-end items-baseline">
+  {lastlogin
+ ? (
+  <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+  ) : (
+    <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+  )}
 
+  {humanReadableTime && (
+    <p className="text-sm text-gray-500">
+      Last Login: {humanReadableTime}
+    </p>
+  )}
+</div>
     <select
     value={currentDataFromFirebase.status}
     onChange={(e) => handleStatusChange(e, id)}
