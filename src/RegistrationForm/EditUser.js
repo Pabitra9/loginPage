@@ -400,41 +400,49 @@ function EditUser() {
             </div>
       <div className="w-full h-full overflow-y-scroll bg-gray-100 rounded-e-md shadow-md">
       <div className="flex flex-wrap gap-4 m-10 mb-0">
-      <div className="w-full flex h-auto items-center justify-between"> 
-      <input
-      type="text"
-      name="name"
-      className="w-auto mb-2 border-b-2 text-5xl font-semibold bg-transparent outline-none capitalize"
-      placeholder="Name"
-      value={currentDataFromFirebase.name}
-      onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value.toLocaleLowerCase() })}
-      />
-   <div className="flex justify-items-end items-baseline">
-  {lastlogin
- ? (
-  <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-  ) : (
-    <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-  )}
+      <div className="w-full flex h-auto items-center justify-between">
+  <input
+    type="text"
+    name="name"
+    className="w-auto mb-2 border-b-2 text-5xl font-semibold bg-transparent outline-none capitalize"
+    placeholder="Name"
+    value={currentDataFromFirebase.name}
+    onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, name: e.target.value.toLocaleLowerCase() })}
+  />
 
-  {humanReadableTime && (
-    <p className="text-sm text-gray-500">
-      Last Login: {humanReadableTime}
-    </p>
+<div className="flex items-center space-x-2">
+  {lastlogin ? (
+    <>
+      <div className="w-4 h-4 bg-[#90EE90] border-green-800 border-4  rounded-full"></div>
+      <span>Online</span>
+    </>
+  ) : (
+    <>
+      <div className="w-4 h-4 bg-[#FF8589] border-red-800 border-4  rounded-full"></div>
+      {humanReadableTime && (
+        <p className="text-sm text-black">
+          Last Login: {humanReadableTime}
+        </p>
+      )}
+    </>
   )}
 </div>
-    <select
+
+
+
+  <select
     value={currentDataFromFirebase.status}
     onChange={(e) => handleStatusChange(e, id)}
     className={`px-2 py-1 outline-none w-auto h-10 rounded ${currentDataFromFirebase?.status === 'Initial fill up' ? 'bg-[#FF8589] border-2 border-red-800 font-medium text-red-800' : currentDataFromFirebase?.status === 'In Progress' ? 'bg-[#90EE90] font-medium border-2 border-green-800 text-green-800' : currentDataFromFirebase?.status === 'Completed' ? 'bg-[#ADD8E6] font-medium border-2 border-blue-800 text-blue-800' : null }`}
-     >
+  >
     {statusOptions.map((option) => (
       <option key={option} value={option} className="bg-white">
         {option}
       </option>
     ))}
-    </select>
-    </div>
+  </select>
+</div>
+
               {/* <label className="mb-2">Date of Birth</label> */}
               <div className="w-1/3">
               <input type="text" name="dob" className="w-full mb-2 border-b-2 outline-none bg-transparent" placeholder="Date of Birth" value={currentDataFromFirebase.dob} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, dob: e.target.value })}/>
