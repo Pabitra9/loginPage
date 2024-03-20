@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { HiPlus, HiX } from "react-icons/hi";
 import CollectionData from '.././Collection.json'
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addUserDataBasedOnId } from "../Redux/DataBasedOnIdSlice";
 
@@ -152,46 +153,161 @@ function EditUser() {
   };
   
 
-  const userToken =JSON.parse(localStorage.getItem('userDatas'))
-  useEffect(() => {
-    const getDatasFromFirebase = async () => {
-      try {
-        const docRef = doc(db, "Database", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setCurrentDataFromFirebase(docSnap.data());
-          const userEmailID = docSnap.data().email
-          setOriginalData(docSnap.data())
-          console.log(userToken);
-          // userDispatch(addUserDataBasedOnId(docSnap.data()))
-          await fetch (`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-id?email_id=${userEmailID}`,{
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${userToken}`,
-            },
-          })
+const userToken = JSON.parse(localStorage.getItem('userDatas'))
+  // useEffect(() => {
+  //   const getDatasFromFirebase = async () => {
+  //     try {
+  //       const docRef = doc(db, "Database", id);
+  //       const docSnap = await getDoc(docRef);
+  //       if (docSnap.exists()) {
+  //         setCurrentDataFromFirebase(docSnap.data());
+  //         const userEmailID = docSnap.data().email
+  //         setOriginalData(docSnap.data())
+  //         console.log(userToken);
+  //         // userDispatch(addUserDataBasedOnId(docSnap.data()))
+  //         await fetch (`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-id?email_id=${userEmailID}`,{
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //             'Authorization': `Bearer ${userToken}`,
+  //           },
+  //         })
+  //           .then(async (res) => {
+  //             if (res.status === 200) {
+  //               const data = await res.json();
+  //               console.log(data);
+  //               setUserId(data?.user_id)
+  //               //console.log(userId);
+  //               console.log("hela");
+  //               await fetch (`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-login-status?user_id=${data?.user_id}`,{
+  //              method: 'POST',
+  //               headers: {
+  //                 'Content-Type': 'application/json',
+  //                 'Authorization': `Bearer ${userToken}`,
+  //               },
+                
+  //             })
+  //               .then(async (res) => {
+  //                 if (res.status === 200) {
+  //                   const data = await res.json();
+  //                   console.log(data);
+  //                   console.log("hela");
+  //                   await fetch (`https://academy.chrmp.com/wp-json/ldlms/v2/users/${data?.user_id}/courses`,{
+  //                     method: 'POST',
+  //                      headers: {
+  //                        'Content-Type': 'application/json',
+  //                        'Authorization': `Bearer ${userToken}`,
+  //                      },
+  //                     })
+                    
+  //                     var timestamp = data.last_login;
+
+  //                     // Convert to milliseconds by multiplying by 1000
+  //                     var milliseconds = timestamp * 1000;
+
+  //                     // Create a new Date object with the milliseconds
+  //                     var dateObject = new Date(milliseconds);
+
+  //                     // Define options for formatting the date and time
+  //                     var options = {
+  //                       year: 'numeric',
+  //                       month: 'numeric',
+  //                       day: 'numeric',
+  //                       hour: 'numeric',
+  //                       minute: 'numeric',
+  //                       second: 'numeric',
+  //                       timeZone: 'Asia/Kolkata', // Indian timezone
+  //                     };
+  //                     // Format the date using the specified options
+  //                     const humanReadableTime = dateObject.toLocaleString('en-IN', options);
+  //                     setHumanReadableTime(humanReadableTime)
+  //                     setLastlogin(data.login_status)
+  //                     console.log(humanReadableTime);
+  //                 }
+  //               }).then(async (res) => {
+  //                 if (res.status === 200) {
+  //                   const data = await res.json();
+  //                   console.log(data);
+  //                   setUserId(data?.user_id)
+  //                   //console.log(userId);
+  //                   console.log("hela");
+  //                   await fetch (`https://academy.chrmp.com/wp-json/ldlms/v2/users/${data?.user_id}/courses`,{
+  //                  method: 'POST',
+  //                   headers: {
+  //                     'Content-Type': 'application/json',
+  //                     'Authorization': `Bearer ${userToken}`,
+  //                   },
+  //                 })
+  //               .catch((error) => {
+  //                 console.error(error)
+  //               });
+  //             }
+  //           })
+  //           .catch((error) => {
+  //             console.error(error)
+  //           });
+  //       }
+  //       }).catch((error) => {
+  //         console.error(error)
+  //       });
+  //   }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+
+  //   if(userToken ) {
+  //   getDatasFromFirebase();
+  //   }
+  // }, [id,userToken]);
+
+  //const userToken = JSON.parse(localStorage.getItem('userDatas'));
+
+useEffect(() => {
+  const getDatasFromFirebase = async () => {
+
+    try {
+      if(!userToken) return;
+      const docRef = doc(db, "Database", id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setCurrentDataFromFirebase(docSnap.data());
+        const userEmailID = docSnap.data().email;
+        console.log(userEmailID);
+        setOriginalData(docSnap.data());
+        console.log(userToken);
+        
+        axios.post(`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-id?email_id=${userEmailID}`,
+        {},
+         {
+          
+          // method: 'POST',
+          headers: {
+            // 'Content-Type': 'application/json',
+            Authorization: `Bearer ${userToken}`,
+          },
+        }).then(async (res) => {
+          if (res.status === 200) {
+            const data = await res.data;
+            console.log(data);
+            setUserId(data?.user_id);
+            console.log("First request success");
+
+            await axios.post(`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-login-status?user_id=${data?.user_id}`,
+            {},
+            {
+              // method: 'POST',
+              headers: {
+                // 'Content-Type': 'application/json',
+                Authorization: `Bearer ${userToken}`,
+              },
+            })
             .then(async (res) => {
               if (res.status === 200) {
-                const data = await res.json();
+                const data = await res.data;
                 console.log(data);
-                setUserId(data?.user_id)
-                //console.log(userId);
-                console.log("hela");
-                await fetch (`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-login-status?user_id=${data?.user_id}`,{
-               method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${userToken}`,
-                },
-              })
-                .then(async (res) => {
-                  if (res.status === 200) {
-                    const data = await res.json();
-                    console.log(data);
-                    
-                    console.log("hela");
-                      var timestamp = data.last_login;
+                console.log("Second request success");
+                var timestamp = data.last_login;
 
                       // Convert to milliseconds by multiplying by 1000
                       var milliseconds = timestamp * 1000;
@@ -214,26 +330,55 @@ function EditUser() {
                       setHumanReadableTime(humanReadableTime)
                       setLastlogin(data.login_status)
                       console.log(humanReadableTime);
+
+                  await axios.get(`https://academy.chrmp.com/wp-json/ldlms/v2/users/${data?.user_id}/courses`, {
+                  // method: 'GET',
+                  headers: {
+                    // 'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userToken}`,
+                  },
+                })
+                .then(async (res) => {
+                  if (res.status === 200) {
+                    const data = await res.data;
+                    console.log(data);
+
+                    console.log("Third request success");
+                  } else {
+                    console.error("Third request failed");
                   }
                 })
                 .catch((error) => {
-                  console.error(error)
+                  console.error("Third request error:", error);
                 });
+
+              } else {
+                console.error("Second request failed");
               }
             })
             .catch((error) => {
-              console.error(error)
+              console.error("Second request error:", error);
             });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
 
-    if(userToken ) {
-    getDatasFromFirebase();
+          } else {
+            console.error("First request failed");
+          }
+        })
+        .catch((error) => {
+          console.log(userToken);
+          console.error("First request error:", error);
+        })
+      }
+    } catch (error) {
+      console.error(error);
     }
-  }, [id,userToken]);
+  };
+
+  if (userToken) {
+    getDatasFromFirebase();
+  }
+}, [id, userToken]);
+
 
   const handleFileChange = (e) => {
     e.preventDefault();
