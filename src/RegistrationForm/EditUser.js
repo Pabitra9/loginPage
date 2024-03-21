@@ -284,7 +284,7 @@ const userToken = JSON.parse(localStorage.getItem('userDatas'))
                   headers: {
                     // 'Content-Type': 'application/json',
                     Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FjYWRlbXkuY2hybXAuY29tIiwiaWF0IjoxNzEwOTM5OTc2LCJuYmYiOjE3MTA5Mzk5NzYsImV4cCI6MTcxMTU0NDc3NiwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiNzUxMiJ9fX0.jgW8bXOSH0WHy42NYjHz9x4LlxGEJO-yDZzGh8AH9FI`,
-                    // "Access-Control-Allow-Origin" : "*",
+                    "Access-Control-Allow-Origin" : "*",
                     // "Access-Control-Allow-Credentials": "true",
                     // "Access-Control-Max-Age": "1800",
                     // "Access-Control-Allow-Headers": "content-type",
