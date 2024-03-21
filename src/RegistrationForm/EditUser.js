@@ -278,7 +278,7 @@ const userToken = JSON.parse(localStorage.getItem('userDatas'))
 // }, [id, userToken]);
 
 // useEffect(()=>{
-   axios.post(`https://academy.chrmp.com/wp-json/ldlms/v2/users/7512/courses`, 
+   axios.get(`https://academy.chrmp.com/wp-json/ldlms/v2/users/7512/courses/`, 
    {},{
                   // method: 'GET',
                   headers: {
