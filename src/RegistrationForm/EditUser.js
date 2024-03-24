@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addUserDataBasedOnId } from "../Redux/DataBasedOnIdSlice";
+import CourseDetails from "./CourseDetails";
 
 
 function EditUser() {
@@ -155,159 +156,113 @@ function EditUser() {
 
 const userToken = JSON.parse(localStorage.getItem('userDatas'))
 
-// useEffect(() => {
-//   const getDatasFromFirebase = async () => {
+useEffect(() => {
+  const getDatasFromFirebase = async () => {
 
-//     try {
-//       if(!userToken) return;
-//       const docRef = doc(db, "Database", id);
-//       const docSnap = await getDoc(docRef);
-//       if (docSnap.exists()) {
-//         setCurrentDataFromFirebase(docSnap.data());
-//         const userEmailID = docSnap.data().email;
-//         console.log(userEmailID);
-//         setOriginalData(docSnap.data());
-//         console.log(userToken);
+    try {
+      if(!userToken) return;
+      const docRef = doc(db, "Database", id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setCurrentDataFromFirebase(docSnap.data());
+        const userEmailID = docSnap.data().email;
+        console.log(userEmailID);
+        setOriginalData(docSnap.data());
+        console.log(userToken);
         
-//         axios.post(`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-id?email_id=${userEmailID}`,
-//         {},
-//          {
+        axios.post(`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-id?email_id=${userEmailID}`,
+        {},
+         {
           
-//           // method: 'POST',
-//           headers: {
-//             // 'Content-Type': 'application/json',
-//             Authorization: `Bearer ${userToken}`,
-//           },
-//         }).then(async (res) => {
-//           if (res.status === 200) {
-//             const data = await res.data;
-//             console.log(data);
-//             setUserId(data?.user_id);
-//             console.log("First request success");
+          // method: 'POST',
+          headers: {
+            // 'Content-Type': 'application/json',
+            Authorization: `Bearer ${userToken}`,
+          },
+        }).then(async (res) => {
+          if (res.status === 200) {
+            const data = await res.data;
+            console.log(data);
+            setUserId(data?.user_id);
+            console.log("First request success");
 
-//             await axios.post(`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-login-status?user_id=${data?.user_id}`,
-//             {},
-//             {
-//               // method: 'POST',
-//               headers: {
-//                 // 'Content-Type': 'application/json',
-//                 Authorization: `Bearer ${userToken}`,
-//               },
-//             })
-//             .then(async (res) => {
-//               if (res.status === 200) {
-//                 const data = await res.data;
-//                 console.log(data);
-//                 console.log("Second request success");
-//                 var timestamp = data.last_login;
+            await axios.post(`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-login-status?user_id=${data?.user_id}`,
+            {},
+            {
+              // method: 'POST',
+              headers: {
+                // 'Content-Type': 'application/json',
+                Authorization: `Bearer ${userToken}`,
+              },
+            })
+            .then(async (res) => {
+              if (res.status === 200) {
+                const data = await res.data;
+                console.log(data);
+                console.log("Second request success");
+                var timestamp = data.last_login;
 
-//                       // Convert to milliseconds by multiplying by 1000
-//                       var milliseconds = timestamp * 1000;
+                      // Convert to milliseconds by multiplying by 1000
+                      var milliseconds = timestamp * 1000;
 
-//                       // Create a new Date object with the milliseconds
-//                       var dateObject = new Date(milliseconds);
+                      // Create a new Date object with the milliseconds
+                      var dateObject = new Date(milliseconds);
 
-//                       // Define options for formatting the date and time
-//                       var options = {
-//                         year: 'numeric',
-//                         month: 'numeric',
-//                         day: 'numeric',
-//                         hour: 'numeric',
-//                         minute: 'numeric',
-//                         second: 'numeric',
-//                         timeZone: 'Asia/Kolkata', // Indian timezone
-//                       };
-//                       // Format the date using the specified options
-//                       const humanReadableTime = dateObject.toLocaleString('en-IN', options);
-//                       setHumanReadableTime(humanReadableTime)
-//                       setLastlogin(data.login_status)
-//                       console.log(humanReadableTime);
+                      // Define options for formatting the date and time
+                      var options = {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric',
+                        timeZone: 'Asia/Kolkata', // Indian timezone
+                      };
+                      // Format the date using the specified options
+                      const humanReadableTime = dateObject.toLocaleString('en-IN', options);
+                      setHumanReadableTime(humanReadableTime)
+                      setLastlogin(data.login_status)
+                      console.log(humanReadableTime);
+              } else {
+                console.error("Second request failed");
+              }
+            })
+            .catch((error) => {
+              console.error("Second request error:", error);
+            });
 
-//                   await axios.get(`https://academy.chrmp.com/wp-json/ldlms/v2/users/${data?.user_id}/courses/`, {
-//                   // method: 'GET',
-//                   headers: {
-//                     // 'Content-Type': 'application/json',
-//                     Authorization: `Bearer ${userToken}`,
-//                     // "Access-Control-Allow-Origin" : "*",
-//                     // "Access-Control-Allow-Credentials": "true",
-//                     // "Access-Control-Max-Age": "1800",
-//                     // "Access-Control-Allow-Headers": "content-type",
-//                     // "Access-Control-Allow-Methods": "PUT, POST, GET, DELETE, PATCH, OPTIONS"
-//                   },
-//                 })
-//                 .then(async (res) => {
-//                   if (res.status === 200) {
-//                     const data = await res.data;
-//                     console.log(data);
+          } else {
+            console.error("First request failed");
+          }
+        })
+        .catch((error) => {
+          console.log(userToken);
+          console.error("First request error:", error);
+        })
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-//                     console.log("Third request success");
-//                   } else {
-//                     console.error("Third request failed");
-//                   }
-//                 })
-//                 .catch((error) => {
-//                   console.log(userToken);
-//                   console.error("Third request error:", error);
-//                 });
-
-//               } else {
-//                 console.error("Second request failed");
-//               }
-//             })
-//             .catch((error) => {
-//               console.error("Second request error:", error);
-//             });
-
-//           } else {
-//             console.error("First request failed");
-//           }
-//         })
-//         .catch((error) => {
-//           console.log(userToken);
-//           console.error("First request error:", error);
-//         })
-//       }
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   };
-
-//   if (userToken) {
-//     getDatasFromFirebase();
-//   }
-// }, [id, userToken]);
+  if (userToken) {
+    getDatasFromFirebase();
+  }
+}, [id, userToken]);
 
 // useEffect(()=>{
-   axios.get(`https://academy.chrmp.com/wp-json/ldlms/v2/users/7512/courses/`, 
-   {},{
-                  // method: 'GET',
-                  headers: {
-                    // 'Content-Type': 'application/json',
-                    Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FjYWRlbXkuY2hybXAuY29tIiwiaWF0IjoxNzEwOTM5OTc2LCJuYmYiOjE3MTA5Mzk5NzYsImV4cCI6MTcxMTU0NDc3NiwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiNzUxMiJ9fX0.jgW8bXOSH0WHy42NYjHz9x4LlxGEJO-yDZzGh8AH9FI`,
-                    "Access-Control-Allow-Origin" : "*",
-                    // "Access-Control-Allow-Credentials": "true",
-                    // "Access-Control-Max-Age": "1800",
-                    // "Access-Control-Allow-Headers": "content-type",
-                    // "Access-Control-Allow-Methods": "PUT, POST, GET, DELETE, PATCH, OPTIONS"
-                  },
-                })
-                .then(async (res) => {
-                  if (res.status === 200) {
-                    const data = await res.data;
-                    console.log(data);
+//   axios.get(`https://academy.chrmp.com/wp-json/custom-app/v1/get-user-course-steps/?user_id=7512&course_id=5005`, {
+//            headers: {
+//              Authorization: `Bearer ${userToken}`,
+//            },
+//         }).then((res)=>{
+//           const data = res.data;
+//           console.log(data);
+//         }).catch((error)=>{
+//           console.error(error)
+//         })
 
-                    console.log("Third request success");
-                  } else {
-                    console.error("Third request failed");
-                  }
-                }) .catch((error) => {
-                  console.log(userToken);
-                  console.error("course request error:", error);
-                });
-
-  
 // },[])
-
 
   const handleFileChange = (e) => {
     e.preventDefault();
@@ -518,7 +473,7 @@ const userToken = JSON.parse(localStorage.getItem('userDatas'))
 </div>
 
               {/* <label className="mb-2">Date of Birth</label> */}
-              <div className="w-1/3">
+              <div className="w-1/3 ">
               <input type="text" name="dob" className="w-full mb-2 border-b-2 outline-none bg-transparent" placeholder="Date of Birth" value={currentDataFromFirebase.dob} onChange={(e) => setCurrentDataFromFirebase({ ...currentDataFromFirebase, dob: e.target.value })}/>
               </div>
               {/* <label className="mb-2">Age</label> */}
@@ -527,7 +482,7 @@ const userToken = JSON.parse(localStorage.getItem('userDatas'))
             </div>
           </div>
           <div>
-            <div className="p-4 rounded-lg shadow-lg ">
+            <div className="p-4 rounded-lg ">
               <div>
               <h2 className="text-2xl font-semibold m-8">Personal Details</h2>
                 <div className="flex flex-wrap gap-4 m-8">
@@ -594,6 +549,7 @@ const userToken = JSON.parse(localStorage.getItem('userDatas'))
         </div>
             <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleSubmit} disabled={loading}>{loading ? "Updating..." : "Update"}</button>
             {/* <button type="submit" className="bg-[#2960a1] m-6 hover:bg-[#8DC162] text-white py-2 px-4 rounded-md focus:outline-none transition duration-300 ease-in-out font-medium" onClick={handleMigrateCollection}>Upload</button> */}
+            <CourseDetails userId={userId} />
           </div>
         </div>
        </div>       
